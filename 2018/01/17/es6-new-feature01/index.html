@@ -55,15 +55,19 @@
           <h4 id="变量-赋值"><a href="#变量-赋值" class="headerlink" title="变量/赋值"></a>变量/赋值</h4><ul>
 <li>var     可以重复定义、不能限制修改、没有块级作用域</li>
 <li>let     不能重复定义、变量、块级作用域</li>
-<li><p>const   不能重复定义、常量、块级作用域</p>
-<h4 id="解构赋值："><a href="#解构赋值：" class="headerlink" title="解构赋值："></a>解构赋值：</h4><ul>
+<li>const   不能重复定义、常量、块级作用域<h4 id="解构赋值："><a href="#解构赋值：" class="headerlink" title="解构赋值："></a>解构赋值：</h4></li>
 <li>左右两边必须一样；右边得是个东西</li>
 <li><p><strong>必须定义和赋值同步完成</strong></p>
-<p>   let [a,b]={a: 12, b: 5};<br>   let {a,b}={12,5};<br>   let [x,{a:{b,c},d},y] = [12,{a:{b:1,c:2},d:3},88];<br>   console.log(<code>a的值是${a},b的值是${b},c的值是${c},d的值是${d}</code>);</p>
-<h4 id="箭头函数"><a href="#箭头函数" class="headerlink" title="箭头函数"></a>箭头函数</h4><p>function (参数,参数){<br> 函数体<br>}</p>
-<p>(参数,参数)=&gt;{<br> 函数体<br>}</p>
-</li>
-</ul>
+<pre><code>let [a,b]={a: 12, b: 5};
+let {a,b}={12,5};
+let [x,{a:{b,c},d},y] = [12,{a:{b:1,c:2},d:3},88];
+console.log(`a的值是${a},b的值是${b},c的值是${c},d的值是${d}`);
+</code></pre><h4 id="箭头函数"><a href="#箭头函数" class="headerlink" title="箭头函数"></a>箭头函数</h4><p>  function (参数,参数){</p>
+<pre><code>函数体
+</code></pre><p>  }</p>
+<p>  (参数,参数)=&gt;{</p>
+<pre><code>函数体
+</code></pre><p>  }</p>
 </li>
 </ul>
 <blockquote>
@@ -208,7 +212,7 @@ json.show();
 </code></pre><h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4></li>
 <li>字符串模板：植入变量、任意折行 <code>a变量的值是：${a}</code></li>
 <li>startsWith 方法</li>
-<li>endsWith 方法<h3 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h3></li>
+<li>endsWith 方法<h4 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h4></li>
 </ul>
 <p>传统 Js 面向对象的民间写法(非官方，不统一)</p>
 <pre><code>function Person(name, age){
