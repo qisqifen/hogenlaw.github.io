@@ -1,0 +1,129 @@
+<html>
+  <head>
+    <title>博客搭建之路-在博客中引用图片、音乐、视频 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/04/23/把博客同时部署到github和coding上/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/04/22/写在前言-我的博客搭建之路/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-04-23</div> --><!--正文的日期-->
+            博客搭建之路-在博客中引用图片、音乐、视频
+          </h1>
+          <p> 我们在写博客的过程中，难免会遇到要使用图片的情况，有的时候嘚吧嘚吧说个十句还不如直接上一张图片管用，比如我上篇文章<a href="https://hogenlaw.github.io/2017/04/22/%E5%86%99%E5%9C%A8%E5%89%8D%E8%A8%80-%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E4%B9%8B%E8%B7%AF/" target="_blank" rel="noopener">写在前言-我的博客搭建之路</a>就引用了几张图片，效果还是可以的；在博客中放入一首音乐能让人在读博客过程中不失乏味无聊(当然这看个人喜好了)；有的时候还会需要引入视频之类的，这篇文章就来总结一下</p>
+<h3 id="引入本地图片"><a href="#引入本地图片" class="headerlink" title="引入本地图片"></a>引入本地图片</h3><p>在\myblog\source目录下新建文件夹，命名为images或者其他你喜欢的名字，然后编辑你的md博文，插入下面的代码样式(如果图片没出来，说明这个不靠谱,下面还有方法二)</p>
+<pre><code>![引入本地图片landscape](/myimage/landscape.png) 
+</code></pre><p><img src="/2017/04/23/博客搭建之路-在博客中引用图片和音乐/landscape.png" alt="landscape"> </p>
+<h3 id="引入网络图片"><a href="#引入网络图片" class="headerlink" title="引入网络图片"></a>引入网络图片</h3><pre><code>![网络图片](http://img1.3lian.com/2015/w7/85/d/21.jpg)
+</code></pre><p><img src="http://img1.3lian.com/2015/w7/85/d/21.jpg" alt="网络图片"></p>
+<h3 id="引入音乐"><a href="#引入音乐" class="headerlink" title="引入音乐"></a>引入音乐</h3><p>这里以网易云音乐举例</p>
+<p><img src="/2017/04/23/博客搭建之路-在博客中引用图片和音乐/localpic.png" alt=""></p>
+<p><img src="/2017/04/23/博客搭建之路-在博客中引用图片和音乐/music.png" alt=""></p>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="298" height="52" src="//music.163.com/outchain/player?type=2&id=3951306&auto=1&height=32"></iframe>
+
+<blockquote>
+<p>注意那段音乐HTML代码粘贴到md里的时候不要有空格，而且你粘贴完md右边预览区显示是错误的，这不用管，切记！！</p>
+</blockquote>
+<h3 id="引入网络视频-以腾讯视频为例"><a href="#引入网络视频-以腾讯视频为例" class="headerlink" title="引入网络视频(以腾讯视频为例)"></a>引入网络视频(以腾讯视频为例)</h3><p><img src="/2017/04/23/博客搭建之路-在博客中引用图片和音乐/tencent.png" alt="这是图片"></p>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="298" height="52" src="//music.163.com/outchain/player?type=2&id=31654455&auto=1&height=32"></iframe>
+
+
+<h3 id="引入本地图片-推荐"><a href="#引入本地图片-推荐" class="headerlink" title="引入本地图片(推荐)"></a>引入本地图片(推荐)</h3><ol>
+<li><p>打开_config.yml 设置 post_asset_folder 属性为 true</p>
+</li>
+<li><p>当您设置post_asset_folder为true参数后，在建立文件时，Hexo<br>会自动建立一个与文章同名的文件夹，您可以把与该文章相关的所有资源都放到那个文件夹，如此一来，您便可以更方便的使用资源。</p>
+</li>
+<li><p>在myblog的目录下执行<code>$ npm install https://github.com/CodeFalling/hexo-asset-image --save</code>（需要等待一段时间）。</p>
+</li>
+<li><p>完成安装后用hexo新建文章的时候会发现_posts目录下面会多出一个和文章名字一样的文件夹，你可以把你本篇博文用到的图片放入这个文件夹内</p>
+<pre><code>![](image/2017-04-23_073929.png)//注意前面这个image你可以随便写，这样写也行：![](博客搭建之路-在博客中引用图片和音乐/2017-04-23_073929.png)
+</code></pre><p>  <img src="/2017/04/23/博客搭建之路-在博客中引用图片和音乐/2017-04-23_073929.png" alt=""></p>
+</li>
+<li><p>等你的博客发布之后，浏览器-&gt;右键查看源代码，你会发现地址是这样的</p>
+<p> <img src="/2017/04/23/博客搭建之路-在博客中引用图片和音乐/2017-04-23_082944.png" alt=""></p>
+</li>
+</ol>
+<blockquote>
+<p>推荐使用这种方法管理，这样每篇博文都可以分门别类存放图片，互不影响</p>
+</blockquote>
+<h3 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h3><p>我们每次用<code>hexo new &quot;博客名&quot;</code>新建博客的时候这里的博客名最好起英文名，这样你生成的存放图片的文件夹也会是英文的了，而浏览器显示给别人看的博客名改成中文就可以了</p>
+<p><img src="/2017/04/23/博客搭建之路-在博客中引用图片和音乐/toggle.png" alt="改名"></p>
+<p> 参考链接：</p>
+<p> <a href="http://www.jianshu.com/p/53e0d2a617da" target="_blank" rel="noopener">Hexo 博客中插入音乐/视频</a></p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-04-23</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

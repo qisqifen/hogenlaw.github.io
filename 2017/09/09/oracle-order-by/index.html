@@ -1,0 +1,185 @@
+<html>
+  <head>
+    <title>oracle 学习之基础篇(二）：排序和三大类型转换 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/09/oracle-single-multiline-function/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/09/oracle-select-where/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-09</div> --><!--正文的日期-->
+            oracle 学习之基础篇(二）：排序和三大类型转换
+          </h1>
+          <h3 id="select-排序"><a href="#select-排序" class="headerlink" title="select 排序"></a>select 排序</h3><p>查询员工信息（编号，姓名，月薪，年薪），按月薪升序排序，默认升序，如果月薪相同，按oracle内置的校验规则排序</p>
+<pre><code>select empno,ename,sal,sal*12 
+from emp 
+order by sal asc; 
+</code></pre><p>查询员工信息（编号，姓名，月薪，年薪），按月薪降序排序</p>
+<pre><code>select empno,ename,sal,sal*12 
+from emp 
+order by sal desc; 
+</code></pre><p>查询员工信息，按入职日期降序排序，使用列名</p>
+<pre><code>select empno,ename,sal,hiredate,sal*12 &quot;年薪&quot; 
+from emp
+order by hiredate desc;
+</code></pre><p>order by后面可以跟列名、别名、表达式、列号（从1开始，在select子句中的列号）</p>
+<pre><code>列名:
+select empno,ename,sal,hiredate,sal*12 &quot;年薪&quot; 
+from emp
+order by hiredate desc;
+
+别名: 
+select empno,ename,sal,hiredate,sal*12 &quot;年薪&quot; 
+from emp
+order by &quot;年薪&quot; desc;
+
+表达式:
+select empno,ename,sal,hiredate,sal*12 &quot;年薪&quot; 
+from emp
+order by sal*12 desc;
+
+列号，从1开始：
+select empno,ename,sal,hiredate,sal*12 &quot;年薪&quot; 
+from emp
+order by 5 desc;
+</code></pre><p>查询员工信息，按佣金升序或降序排列，null值看成最大值</p>
+<pre><code>select * from emp order by comm desc;
+</code></pre><p>查询员工信息，对有佣金的员工，按佣金降序排列，当order by 和 where 同时出现时，order by 在最后</p>
+<pre><code>select *
+from emp
+where comm is not null
+order by comm desc;
+</code></pre><p>查询员工信息，按工资降序排列,相同工资的员工再按入职时间降序排列</p>
+<pre><code>select *
+from emp
+order by sal desc,hiredate desc;
+
+select *
+from emp
+order by sal desc,hiredate asc;
+</code></pre><blockquote>
+<p>注意：只有当sal相同的情况下，hiredate排序才有作用</p>
+</blockquote>
+<p>查询20号部门，且工资大于1500，按入职时间降序排列</p>
+<pre><code>select *
+from emp
+where (deptno=20) and (sal&gt;1500)
+order by hiredate desc;
+</code></pre><hr>
+<h3 id="oracle-三大类型转换"><a href="#oracle-三大类型转换" class="headerlink" title="oracle 三大类型转换"></a>oracle 三大类型转换</h3><p>oracle 中三大类型与隐式数据类型转换</p>
+<ul>
+<li>varchar2 变长/char定长–&gt;number，例如：’123’-&gt;123</li>
+<li>varchar2/char–&gt;date，例如：’25-4月-15’-&gt;’25-4月-15’</li>
+<li>number—-&gt;varchar2/char，例如：123-&gt;’123’</li>
+<li>date——&gt;varchar2/char，例如：’25-4月-15’-&gt;’25-4月-15’</li>
+</ul>
+<p>oracle如何隐式转换：</p>
+<ul>
+<li>=号二边的类型是否相同</li>
+<li>如果=号二边的类型不同，尝试的去做转换</li>
+<li>在转换时，要确保合法合理，否则转换会失败，例如：12月不会有32天，一年中不会有13月</li>
+</ul>
+<p>查询1980年12月17日入职的员工（方式一：日期隐示式转换）</p>
+<pre><code>select * from emp where hiredate = &apos;17-12月-80&apos;;
+</code></pre><p>使用to_char(日期，’格”常量”式’)函数将日期转成字符串，显示如下格式：2015 年 04 月 25 日星期六</p>
+<pre><code>select to_char(sysdate,&apos;yyyy&quot; 年 &quot;mm&quot; 月 &quot;dd&quot; 日 &quot;day&apos;) from dual;
+</code></pre><p>使用to_char(日期，’格式’)函数将日期转成字符串，显示如格式：2015-04-25今天是星期15:15:15</p>
+<pre><code>select to_char(sysdate,&apos;yyyy-mm-dd&quot;今天是&quot;day hh24:mi:ss&apos;) from dual;
+或
+select to_char(sysdate,&apos;yyyy-mm-dd&quot;今天是&quot;day HH12:MI:SS AM&apos;) from dual;
+</code></pre><p>使用to_char(数值，’格式’)函数将数值转成字符串，显示如下格式：$1,234</p>
+<pre><code>select to_char(1234,&apos;$9,999&apos;) from dual;
+</code></pre><p>使用to_char(数值，’格式’)函数将数值转成字符串，显示如下格式：￥1,234select to_char(1234,’$9,999’) from dual;</p>
+<pre><code>select to_char(1234,&apos;L9,999&apos;) from dual;
+</code></pre><p>使用to_date(‘字符串’,’格式’)函数，查询1980年12月17日入职的员工（方式二：日期显式转换）</p>
+<pre><code>select * from emp where hiredate = to_date(&apos;1980年12月17日&apos;,&apos;yyyy&quot;年&quot;mm&quot;月&quot;dd&quot;日&quot;&apos;);
+或
+select * from emp where hiredate = to_date(&apos;1980#12#17&apos;,&apos;yyyy&quot;#&quot;mm&quot;#&quot;dd&apos;);
+或
+select * from emp where hiredate = to_date(&apos;1980-12-17&apos;,&apos;yyyy-mm-dd&apos;);
+</code></pre><p>使用to_number(‘字符串’)函数将字符串‘123’转成数字123</p>
+<pre><code>select to_number(&apos;123&apos;) from dual;
+</code></pre><blockquote>
+<p>注意：</p>
+<blockquote>
+<p>select ‘123’ + 123 from dual;–值为 246</p>
+<p>select ‘123’ || 123 from dual;–值为123123</p>
+</blockquote>
+</blockquote>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-09</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

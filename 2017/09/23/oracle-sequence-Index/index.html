@@ -1,0 +1,187 @@
+<html>
+  <head>
+    <title>oracle 学习之基础篇(九)：序列和索引 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/27/plsql-learning-1/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/23/oracle-transaction-view/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-23</div> --><!--正文的日期-->
+            oracle 学习之基础篇(九)：序列和索引
+          </h1>
+          <h3 id="序列"><a href="#序列" class="headerlink" title="序列"></a>序列</h3><p>什么是序列【Sequence】</p>
+<ol>
+<li>类似于MySQL中的auto_increment自动增长机制，但Oracle中无auto_increment机制</li>
+<li>是oracle提供的一个产生唯一数值型值的机制</li>
+<li>通常用于表的主健值</li>
+<li>序列只能保证唯一，不能保证连续<br> 【 声明：oracle中，只有rownum永远保持从1开始，且继续】</li>
+<li>序列值，可放于内存，取之较快</li>
+</ol>
+<p>为什么oracle不直接用rownum做主健呢？</p>
+<p>rownum=1这条记录不能永远唯一表示SMITH这个用户<br>但主键=1确可以永远唯一表示SMITH这个用户</p>
+<p>为什么要用序列</p>
+<ol>
+<li>以前我们为主健设置值，需要人工设置值，容易出错</li>
+<li>以前每张表的主健值，是独立的，不能共享</li>
+</ol>
+<p>为 emp 表的 empno 字段，创建序列<code>emp_empno_seq</code>，create sequence 序列名</p>
+<pre><code>create sequence emp_empno_seq;
+</code></pre><p>删除序列<code>emp_empno_seq</code>，drop sequence 序列名</p>
+<pre><code>drop sequence emp_empno_seq;
+</code></pre><p>查询<code>emp_empno_seq</code>序列的当前值 currval 和下一个值 nextval，第一次使用序列时，必须选用：序列名.nextval</p>
+<pre><code>select emp_empno_seq.nextval from dual;
+select emp_empno_seq.currval from dual;
+</code></pre><p>使用序列，向 emp 表插入记录，empno 字段使用序列值</p>
+<pre><code>insert into emp(empno) values(emp_empno_seq.nextval);
+insert into emp(empno) values(emp_empno_seq.nextval);
+insert into emp(empno) values(emp_empno_seq.nextval);
+</code></pre><p>修改    <code>emp_empno_seq</code>序列的 increment by属性为20，默认 start with是1，alter sequence 序列名</p>
+<pre><code>alter sequence emp_empno_seq increment by 20;
+</code></pre><p>修改修改<code>emp_empno_seq</code>序列的的 increment by 属性为5</p>
+<pre><code>alter sequence emp_empno_seq increment by 5;
+</code></pre><p>修改<code>emp_empno_seq</code>序列的 start with 属性</p>
+<pre><code>alter sequence emp_empno_seq start with 100;
+</code></pre><p>有了序列后，还能为主健手工设置值吗？</p>
+<pre><code>insert into emp(empno) values(9999);
+insert into emp(empno) values(7900);
+</code></pre><blockquote>
+<p>无法对序列做 insert 操作</p>
+<p>删除序列，表真正亡，序列亡</p>
+</blockquote>
+<h3 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h3><p>什么是索引【Index】</p>
+<ul>
+<li>是一种快速查询表中内容的机制，类似于新华字典的目录</li>
+<li>运用在表中某个/些字段上，但存储时，独立于表之外</li>
+</ul>
+<p>为什么要用索引</p>
+<ul>
+<li>通过指针加速Oracle服务器的查询速度</li>
+<li>通过rowid快速定位数据的方法，减少磁盘I/O<br>   【rowid是oracle中唯一确定每张表不同记录的唯一身份证】</li>
+</ul>
+<p>rowid的特点</p>
+<ol>
+<li>位于每个表中，但表面上看不见，例如：desc emp是看不见的</li>
+<li>只有在select中，显示写出rowid，方可看见</li>
+<li>它与每个表绑定在一起，表亡，该表的rowid亡，二张表rownum可以相同，但rowid必须是唯一的</li>
+<li>rowid是18位大小写加数字混杂体，唯一表代该条记录在DBF文件中的位置</li>
+<li>rowid可以参与=/like比较时，用’’单引号将rowid的值包起来，且区分大小写</li>
+<li>rowid是联系表与DBF文件的桥梁</li>
+</ol>
+<p>索引的特点</p>
+<ol>
+<li>索引一旦建立, Oracle管理系统会对其进行自动维护, 而且由Oracle管理系统决定何时使用索引</li>
+<li>用户不用在查询语句中指定使用哪个索引</li>
+<li>在定义primary key或unique约束后系统自动在相应的列上创建索引</li>
+<li>用户也能按自己的需求，对指定单个字段或多个字段，添加索引</li>
+</ol>
+<p>什么时候【要】创建索引</p>
+<ol>
+<li>表经常进行 SELECT 操作</li>
+<li>表很大(记录超多)，记录内容分布范围很广</li>
+<li>列名经常在 WHERE 子句或连接条件中出现<blockquote>
+<p>注意：符合上述某一条要求，都可创建索引，创建索引是一个优化问题，同样也是一个策略问题</p>
+</blockquote>
+</li>
+</ol>
+<p>什么时候【不要】创建索引</p>
+<ul>
+<li>表经常进行 INSERT/UPDATE/DELETE 操作</li>
+<li>表很小(记录超少)</li>
+<li>列名不经常作为连接条件或出现在 WHERE 子句中<blockquote>
+<p>注意：符合上述某一条要求，都可创建索引，创建索引是一个优化问题，同样也是一个策略问题</p>
+</blockquote>
+</li>
+</ul>
+<p>为 emp 表的 empno 单个字段，创建索引<code>emp_empno_idx</code>，叫单列索引，create index 索引名 on 表名(字段,…)</p>
+<pre><code>create index emp_empno_idx on emp(empno);
+</code></pre><blockquote>
+<p>注意：索引创建后，只有查询表有关，和其它（insert/update/delete）无关,解决速度问题</p>
+</blockquote>
+<p>为 emp 表的 ename,job 多个字段，创建索引<code>emp_ename_job_idx</code>，多列索引/联合索引</p>
+<pre><code>create index emp_ename_job on emp(ename,job);
+</code></pre><blockquote>
+<p>如果在where中只出现job不使用索引</p>
+<p>如果在where中只出现ename使用索引</p>
+<p>提倡同时出现ename和job</p>
+</blockquote>
+<p>删除<code>emp_empno_idx</code>和<code>emp_ename_job_idx</code>索引，drop index 索引名</p>
+<pre><code>drop index emp_empno_idx;
+drop index emp_ename_job_idx;
+</code></pre>
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-23</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

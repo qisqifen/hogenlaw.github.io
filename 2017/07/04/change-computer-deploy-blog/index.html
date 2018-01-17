@@ -1,0 +1,119 @@
+<html>
+  <head>
+    <title>更换了电脑如何更新博客 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/09/oracle-select-where/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/05/25/utils/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-07-04</div> --><!--正文的日期-->
+            更换了电脑如何更新博客
+          </h1>
+          <p>一晃差不多一两个月没有更新博客了，一方面，这东西的确需要坚持写作，另外笔者遇到的情况是 之前用于发布博客的那台电脑被我卖了(太卡了，唉！说多了都是泪….)，而我又辞了工作，这样一来手里头就没本本了，也就没怎么更新了。后来找着了新工作，陆续入职。也一直提醒着自己博客不能停，毕竟搭建起来花费了不少精力，一定要坚持，就这样拖到现在，随便一折腾时间就过去一大半了</p>
+<p>好了话说回来，换了电脑如何继续更新博客呢，要确保之前的配置文章之类的不变，网上搜了好久，发现如下方法执行起来还是可以的，方便、可靠。</p>
+<ol>
+<li>在新电脑重新安装 git，可以去<a href="https://git-scm.com/download/" target="_blank" rel="noopener">官网下载</a></li>
+<li><p>重新安装 Node.js</p>
+<p> <a href="https://nodejs.org/dist/v6.10.2/node-v6.10.2-x86.msi" target="_blank" rel="noopener">windows 32 位安装包下载地址</a></p>
+<p> <a href="https://nodejs.org/dist/v4.4.3/node-v4.4.3-x64.msi" target="_blank" rel="noopener">windows 64 位安装包下载地址</a></p>
+</li>
+<li><p>安装 hexo，在电脑桌面–&gt;右键–&gt;<code>git bash here</code>，键入如下命令</p>
+<p> <code>npm install -g hexo</code></p>
+</li>
+<li><p>接下来就将原来的文件拷贝到新电脑中(在之前的电脑卖出前我已将博客文件夹下所有文件全部备份到了优盘，如下图)，分如下步骤：</p>
+</li>
+</ol>
+<p><img src="/2017/07/04/change-computer-deploy-blog/image1.png" alt="备份的博客"></p>
+<ul>
+<li>类似之前一样，我在这台新电脑 E 盘也建了一个 myblog 文件夹，把之前备份的博客文件夹下的_config.yml，themes，source，scaffolds，package.json，.gitignore 拷贝到新电脑的 myblog 文件夹下</li>
+<li>在 E 盘 myblog 文件夹下右键–&gt;<code>git bash here</code>，键入<code>npm install</code>命令进行模块安装</li>
+</ul>
+<blockquote>
+<blockquote>
+<p>注意 这里我们没有用<code>hexo init</code>初始化初始化，因为有的文件我们已经拷贝生成过来了，所以不必用<code>hexo init</code>去整体初始化，如果不慎在此时用了<code>hexo init</code>，则站点的配置文件_config.yml里面内容会被清空使用默认值，切记切记</p>
+</blockquote>
+</blockquote>
+<ul>
+<li><p>进入 myblog 根目录下，敲如下命令，为了使用<code>hexo d</code>命令来部署到git上</p>
+<pre><code>npm install hexo-deployer-git --save
+</code></pre></li>
+<li>好了，测试一下，现在新建一篇文章，编辑完了然后敲<code>hexo g -d</code>看是不是部署成功了！</li>
+</ul>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-07-04</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

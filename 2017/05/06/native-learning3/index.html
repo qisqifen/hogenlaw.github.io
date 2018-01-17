@@ -1,0 +1,182 @@
+<html>
+  <head>
+    <title>html通过native.js调用原生android API代码段总结 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/05/07/singleton/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/05/06/ireport-learning/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-05-06</div> --><!--正文的日期-->
+            html通过native.js调用原生android API代码段总结
+          </h1>
+          <p>本篇文章是 native.js 系列的第三篇，都是以前做 Hybrid App 项目的重新总结，关于这部分DCloud 官网也有代码示例，<a href="http://ask.dcloud.net.cn/article/114" target="_blank" rel="noopener">地址在这儿</a>，但是我发现有的代码段运行后是不能起作用的，这里就把我需要用到的几个模块重新修改了一下，如下：</p>
+<p><strong>调用Android SharePreference数据</strong></p>
+<pre><code>function getDataFromAndroid(){
+     var Toast = plus.android.importClass(&quot;android.widget.Toast&quot;);
+     var Context = plus.android.importClass(&quot;android.content.Context&quot;);
+     var SharedPreferences = plus.android.importClass(&quot;android.content.SharedPreferences&quot;);
+     var sp = mainActivity.getSharedPreferences(&quot;data&quot;,Context.MODE_PRIVATE);
+     var value1 = plus.android.invoke(sp,&quot;getString&quot;,&quot;data1&quot;,&quot;&quot;);
+     var value2 = plus.android.invoke(sp,&quot;getString&quot;,&quot;data2&quot;,&quot;&quot;);
+     var toast = Toast.makeText(mainActivity,&quot;data1:&quot;+value1+&quot;\n&quot;+&quot;data2：&quot;+value2,Toast.LENGTH_SHORT);
+     toast.show();
+}
+</code></pre><p><strong>调用Android本地分享</strong></p>
+<pre><code>function shareContent(){
+    var Intent = plus.android.importClass(&quot;android.content.Intent&quot;);
+    var shareIntent = new Intent(Intent.ACTION_SEND);
+    plus.android.invoke(shareIntent,&quot;setType&quot;,&quot;text/plain&quot;);
+    plus.android.invoke(shareIntent,&quot;putExtra&quot;,Intent.EXTRA_TEXT,&quot;this is my share text&quot;);
+    &lt;!--shareIntent.setType(&quot;text/plain&quot;);--&gt;
+    &lt;!--shareIntent.putExtra(Intent.EXTRA_TEXT,&quot;this is my share text&quot;);--&gt;
+    mainActivity.startActivity(Intent.createChooser(shareIntent,&quot;share to...&quot;));
+}
+</code></pre><p><strong>直接拨打电话</strong></p>
+<pre><code>function callPhone(){
+  var Intent = plus.android.importClass(&quot;android.content.Intent&quot;);
+  var Uri = plus.android.importClass(&quot;android.net.Uri&quot;);
+  var uri = Uri.parse(&quot;tel:10086&quot;);
+  var callIntent = new Intent(&quot;android.intent.action.CALL&quot;,uri);
+  mainActivity.startActivity(callIntent);
+}
+</code></pre><p><strong>获取手机内存信息</strong></p>
+<pre><code>function getMemorySize() {
+    var Toast = plus.android.importClass(&quot;android.widget.Toast&quot;);
+    var Context = plus.android.importClass(&quot;android.content.Context&quot;);
+    var ActivityManager = plus.android.importClass(&quot;android.app.ActivityManager&quot;);
+    var memoryInfo = new ActivityManager.MemoryInfo();
+    var activityService = mainActivity.getSystemService(Context.ACTIVITY_SERVICE);
+    activityService.getMemoryInfo(memoryInfo);
+    var availRAMSize = memoryInfo.plusGetAttribute(&quot;availMem&quot;);
+    var toast = Toast.makeText(mainActivity,&quot;可用内存：&quot;+availRAMSize,Toast.LENGTH_SHORT);
+    toast.show();
+}
+</code></pre><p><strong>打开网络设置</strong></p>
+<pre><code>/*var intent = new Intent(&apos;android.settings.WIFI_SETTINGS&apos;)*/
+function openNetwork(){
+    var Intent = plus.android.importClass(&quot;android.content.Intent&quot;);
+    var Settings = plus.android.importClass(&quot;android.provider.Settings&quot;);
+    &lt;!--android.settings.SETTINGS和android.settings.WIRELESS_SETTINGS是同一个界面--&gt;
+    &lt;!--var intent = new Intent(&apos;android.settings.SETTINGS&apos;);--&gt;
+    &lt;!--用如下方式需要导入Settings包--&gt;
+    var intent = new Intent(Settings.ACTION_SETTINGS);
+    mainActivity.startActivity(intent);
+}
+</code></pre><p><strong>读取手机联系人</strong></p>
+<pre><code>function readContacts(){
+      var REQUESTCODE = 1000;
+      var Intent = plus.android.importClass(&apos;android.content.Intent&apos;);
+      var ContactsContract = plus.android.importClass(&apos;android.provider.ContactsContract&apos;);
+      var intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+      mainActivity.startActivityForResult(intent, REQUESTCODE);
+
+      mainActivity.onActivityResult = function(requestCode, resultCode, data) {
+          if (REQUESTCODE == requestCode) {
+              var phoneNumber = null;
+              var resultString = &quot;&quot;;
+              var context = mainActivity;
+              plus.android.importClass(data);
+              var contactData = data.getData();
+              var resolver = context.getContentResolver();
+              plus.android.importClass(resolver);
+              var cursor = resolver.query(contactData, null, null, null, null);
+              plus.android.importClass(cursor);
+              cursor.moveToFirst();
+              var s_ret;
+              var givenName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+              s_ret = givenName;
+              var contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+              var pCursor = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+               null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + &quot; = &quot; + contactId,
+               null, null);
+              while (pCursor.moveToNext()) {
+               phoneNumber =   pCursor.getString( pCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+               s_ret += &apos;\n&apos; + phoneNumber;
+              }
+              alert(s_ret);
+              cursor.close();
+              pCursor.close();
+          }
+      };
+  }
+</code></pre><blockquote>
+<p>上面都是一个个的函数，你只要在 html 中 button 点击事件调用如上方法即可</p>
+</blockquote>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="298" height="52" src="//music.163.com/outchain/player?type=2&id=20744788&auto=1&height=32"></iframe>
+          <br>
+<p>hogen</p>
+<div class='date'>2017-05-06</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

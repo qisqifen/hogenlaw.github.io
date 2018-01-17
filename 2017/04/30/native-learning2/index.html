@@ -1,0 +1,276 @@
+<html>
+  <head>
+    <title>利用 Native.js 实现 Android 与 HTML 数据的交互 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/05/01/QA/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/04/30/Native-learning1/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-04-30</div> --><!--正文的日期-->
+            利用 Native.js 实现 Android 与 HTML 数据的交互
+          </h1>
+          <p> <a href="http://ask.dcloud.net.cn/docs/#//ask.dcloud.net.cn/article/88" target="_blank" rel="noopener">Native.js技术</a>，简称NJS，是一种将手机操作系统的原生对象转义，映射为JS对象，在JS里编写原生代码的技术，由<a href="http://dcloud.io/" target="_blank" rel="noopener">DCloud(数字天堂)公司</a>开发。说人话就是：通过 native.js, 你可以在 html 代码的<code>&lt;script&gt;&lt;/script&gt;</code>标签中用 native.js语法直接调用 Android 原生 API。</p>
+<p> 本次文章主要目的是学习如何利用 Native.js 实现在 HTML 中获取 Android 原生代码的数据，很多人一看到”html与Android数据交互”可能都会想到WebView，在 webview 中使用 jsBridge，是的，我一开始也是这个念头，遗憾的是我当时的项目使用的是 DCloud 的 MUI 框架，所有页面都是由 html+js 组成,几乎没怎么用到 Android 原生控件，所以这个方法行不通，当然现在的hybrid 模式的框架，原理都是封装一层 JSBridge ，通过 JSBridge 去访问原生的硬件功能。</p>
+<p> 本次项目是从<a href="http://hogenlaw.com/2017/04/30/Native-learning1/" target="_blank" rel="noopener">AndroidStudio 创建 Hybrid App工程</a>项目基础修改而来，把<a href="http://hogenlaw.com/2017/04/30/Native-learning1/" target="_blank" rel="noopener">AndroidStudio 创建 Hybrid App工程</a>没有用到的 MainActivity 加上(如果被删掉了就再创建一个)，大体思路就是在 MainActivity 数据持久化，然后在 html 页面通过 native.js 获取，MainActivity修改代码如下：</p>
+<pre><code>public class MainActivity extends ListActivity {
+    private static final String TAG = &quot;MainActivity&quot;;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //存放一些数据到SharePreferences
+        initData();
+        setListAdapter(new MyListAdapter());
+        getListView().setTextFilterEnabled(true);
+    }
+
+    private void initData() {
+        //Log.d(TAG, &quot;initData: hello&quot;);
+        SharedPreferences sharedPreferences = getSharedPreferences(&quot;data&quot;, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putString(&quot;data1&quot;,&quot;aaaa&quot;).putString(&quot;data2&quot;,&quot;bbbb&quot;).apply();
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        Intent intent = new Intent(this,activityInfos[position].clazz);
+        startActivity(intent);
+    }
+
+    ActiviyInfo[] activityInfos = new ActiviyInfo[]{
+            new ActiviyInfo(&quot;SDK_APP&quot;,SDK_Runtime.class),
+            new ActiviyInfo(&quot;SDK_WEBAPP&quot;,SDK_WebApp.class)
+    };
+    class ActiviyInfo{
+        String title;
+        Class&lt;? extends Activity&gt; clazz;
+
+        public ActiviyInfo(String title, Class&lt;? extends Activity&gt; clazz) {
+            this.title = title;
+            this.clazz = clazz;
+        }
+    }
+    class MyListAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return activityInfos.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return activityInfos[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView tv = new TextView(parent.getContext());
+            tv.setHeight(100);
+            tv.setGravity(Gravity.CENTER);
+            tv.setText(activityInfos[position].title);
+            convertView = tv;
+            return convertView;
+        }
+    }
+}
+</code></pre><p> 上面代码我直接用了 Android-SDK 中 HBuilder-Integrate 中的代码，MainActivity 中的SDK_Runtime 和 SDK_Webapp 类 直接从 HBuilder-Integrate/src下拷贝过来的</p>
+<p> <img src="/2017/04/30/native-learning2/image1.png" alt="image"></p>
+<p> 当然，在AndroidManifest.xml中要配置 activity(这里贴出主要代码)</p>
+<pre><code>&lt;application
+    android:name=&quot;io.dcloud.application.DCloudApplication&quot;
+    android:allowClearUserData=&quot;true&quot;
+    android:icon=&quot;@drawable/icon&quot;
+    android:label=&quot;@string/app_name&quot;
+    android:largeHeap=&quot;true&quot;&gt;
+    &lt;activity
+        android:name=&quot;io.dcloud.PandoraEntry&quot;
+        android:configChanges=&quot;orientation|keyboardHidden|keyboard|navigation&quot;
+        android:hardwareAccelerated=&quot;true&quot;
+        android:label=&quot;@string/app_name&quot;
+        android:launchMode=&quot;singleTask&quot;
+        android:screenOrientation=&quot;user&quot;
+        android:theme=&quot;@style/TranslucentTheme&quot;
+        android:windowSoftInputMode=&quot;adjustResize&quot;&gt;
+    &lt;/activity&gt;
+    &lt;activity android:name=&quot;.MainActivity&quot;
+        android:theme=&quot;@style/AppTheme&quot;&gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+
+            &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/activity&gt;
+    &lt;activity
+        android:name=&quot;io.dcloud.PandoraEntryActivity&quot;
+        android:configChanges=&quot;orientation|keyboardHidden|screenSize|keyboard|navigation|mcc|mnc|fontScale&quot;
+        android:hardwareAccelerated=&quot;true&quot;
+        android:label=&quot;5+Debug&quot;
+        android:launchMode=&quot;singleTask&quot;
+        android:screenOrientation=&quot;user&quot;
+        android:theme=&quot;@style/DCloudTheme&quot;
+        android:windowSoftInputMode=&quot;adjustResize&quot;&gt;
+    &lt;/activity&gt;
+    &lt;activity
+        android:name=&quot;.SDK_Runtime&quot;
+        android:configChanges=&quot;orientation|keyboardHidden|screenSize|keyboard|navigation|mcc|mnc|fontScale&quot;
+        android:screenOrientation=&quot;sensor&quot;&gt;
+    &lt;/activity&gt;
+    &lt;activity
+        android:name=&quot;.SDK_WebApp&quot;
+        android:configChanges=&quot;orientation|keyboardHidden|screenSize|keyboard|navigation|mcc|mnc|fontScale&quot;
+        android:screenOrientation=&quot;user&quot;
+        android:theme=&quot;@android:style/Theme.Translucent&quot;&gt;
+    &lt;/activity&gt;
+    &lt;service
+        android:name=&quot;io.dcloud.common.adapter.io.MiniServerService&quot;
+        android:exported=&quot;true&quot; /&gt;
+&lt;/application&gt;
+</code></pre><p> 运行程序后界面是这样子</p>
+<p> <img src="/2017/04/30/native-learning2/image3.png" alt="image3"></p>
+<h3 id="接下来就是在html中取值了"><a href="#接下来就是在html中取值了" class="headerlink" title="接下来就是在html中取值了"></a>接下来就是在html中取值了</h3><ul>
+<li><p>首先找到调用native.js的那部分html页面</p>
+<p>  <img src="/2017/04/30/native-learning2/njs.png" alt=""></p>
+</li>
+<li><p>根据 DCloud 提供的如何使用<a href="http://ask.dcloud.net.cn/docs/#//ask.dcloud.net.cn/article/88" target="_blank" rel="noopener"> native.js 语法</a>来写</p>
+<pre><code>&lt;!DOCTYPE HTML&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;/&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;/&gt;
+    &lt;title&gt;Hello H5+&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;../css/common.css&quot;&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;../js/common.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        function njsAlertForAndroid(){
+            &lt;!--全局环境--&gt;
+            var mainActivity = plus.android.runtimeMainActivity();
+            &lt;!--导包--&gt;
+            var Toast = plus.android.importClass(&quot;android.widget.Toast&quot;);
+            var Context = plus.android.importClass(&quot;android.content.Context&quot;);
+            var SharedPreferences = plus.android.importClass(&quot;android.content.SharedPreferences&quot;);
+            var sp = mainActivity.getSharedPreferences(&quot;data&quot;,Context.MODE_PRIVATE);
+            &lt;!--var a = sp.getString(&quot;a&quot;,&quot;&quot;);--&gt;//这种写法不行
+            &lt;!--var b = sp.getString(&quot;b&quot;,&quot;&quot;);--&gt;
+            var value1 = plus.android.invoke(sp,&quot;getString&quot;,&quot;data1&quot;,&quot;&quot;);
+            var value2 = plus.android.invoke(sp,&quot;getString&quot;,&quot;data2&quot;,&quot;&quot;);
+            var toast = Toast.makeText(mainActivity,&quot;data1:&quot;+value1+&quot;\n&quot;+&quot;data2：&quot;+value2,Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header id=&quot;header&quot;&gt;
+    &lt;div class=&quot;nvbt iback&quot; onclick=&quot;back(true);&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;nvtt&quot;&gt;Native.JS&lt;/div&gt;
+    &lt;div class=&quot;nvbt idoc&quot; onclick=&quot;openDoc(&apos;Native.JS Document&apos;,&apos;/doc/native.js.html&apos;)&quot;&gt;&lt;/div&gt;
+&lt;/header&gt;
+&lt;div id=&quot;dcontent&quot; class=&quot;dcontent&quot;&gt;
+    &lt;br/&gt;
+    &lt;ul class=&quot;dlist&quot;&gt;
+        &lt;li class=&quot;ditem&quot; onclick=&quot;njsAlertForAndroid()&quot;&gt;native.js调用Android原生代码数据&lt;/li&gt;
+        &lt;li class=&quot;ditem&quot; onclick=&quot;clicked(&apos;njs_efficient.html&apos;)&quot;&gt;native.js高级API&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;br/&gt;
+    &lt;div class=&quot;button button-waring&quot;
+         onclick=&quot;plus.runtime.openURL(&apos;http://ask.dcloud.net.cn/article/114&apos;);&quot;&gt;更多示例...
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&quot;output&quot;&gt;
+    Native.JS一种把操作系统的原生对象转义，映射为JS对象，在JS里编写原生代码的技术。可通过plus.android.*和plus.ios.*提供的API分别调用Android和iOS平台的Native
+    API。
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;../js/immersed.js&quot;&gt;&lt;/script&gt;
+&lt;/html&gt;
+</code></pre><blockquote>
+<p>注意，限于篇幅，我把njs.html的一些无关代码代码简化了</p>
+</blockquote>
+</li>
+<li><p>运行程序，可以看到，值已经成功取出来了 </p>
+<p>  <img src="/2017/04/30/native-learning2/last.png" alt=""></p>
+</li>
+</ul>
+<p>更多关于使用 native.js的例子可以查看这里： <a href="http://ask.dcloud.net.cn/article/114" target="_blank" rel="noopener">Native.js示例汇总</a></p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-04-30</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

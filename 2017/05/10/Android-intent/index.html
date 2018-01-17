@@ -1,0 +1,253 @@
+<html>
+  <head>
+    <title>Android 生命周期及 Intent 使用 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/05/10/Android-develop-summary/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/05/07/singleton/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-05-10</div> --><!--正文的日期-->
+            Android 生命周期及 Intent 使用
+          </h1>
+          <blockquote>
+<p>此博内容为读第二行代码时所记的笔记总结</p>
+</blockquote>
+<h3 id="返回栈"><a href="#返回栈" class="headerlink" title="返回栈"></a>返回栈</h3><p>Android 是使用任务栈(Task)来管理活动的，一个任务就是一组存放在栈里的活动的集合，这个栈也被称作返回栈(Back Stack),在默认情况下，每当我们启动了一个新的活动，它会在返回栈中入栈，并处于栈顶的位置。而每当我们<br>按下 Back键或调用 finish() 方法去销毁一个活动时，处于栈顶的活动会出栈，这时前一个入<br>栈的活动就会重新处于栈顶的位置。系统总是会显示处于栈顶的活动给用户</p>
+<h3 id="活动周期"><a href="#活动周期" class="headerlink" title="活动周期"></a>活动周期</h3><ul>
+<li>onCreate(): 在这个方法中完成活动的初始化操作，比如说加载布局、绑定事件等</li>
+<li>onStart(): 这个方法在活动由不可见变为可见的时候调用。</li>
+<li>onResume():这个方法在活动准备好和用户进行交互的时候调用。 此时的活动一定位于返回栈的<br>栈顶，并且处于运行状态。</li>
+<li>onPause(): 这个方法在系统准备去启动或者恢复另一个活动的时候调用。 我们通常会在这个方<br>法中将一些消耗 CPU 的资源释放掉，以及保存一些关键数据，但这个方法的执行速度<br>一定要快，不然会影响到新的栈顶活动的使用。</li>
+<li>onStop():　这个方法在活动完全不可见的时候调用。它和 onPause()方法的主要区别在于，如<br>果启动的新活动是一个对话框式的活动，那么 onPause() 方法会得到执行，而 onStop() 方法并不会执行。</li>
+<li>onDestory(): 这个方法在活动被销毁之前调用，之后活动的状态将变为销毁状态。</li>
+<li><p>onRestart(): 这个方法在活动由停止状态变为运行状态之前调用，也就是活动被重新启动了</p>
+<p><img src="/2017/05/10/Android-intent/circle.jpg" alt=""></p>
+</li>
+</ul>
+<h3 id="Android活动的四种启动模式"><a href="#Android活动的四种启动模式" class="headerlink" title="Android活动的四种启动模式"></a>Android活动的四种启动模式</h3><ul>
+<li><strong>standard</strong>: standard 是活动默认的启动模式，在不进行显式指定的情况下，所有活动都会自动使用这种启动模式。在 standard 模式（即默认情况）下，每当启动一个新的活动，它就会在返回栈中入栈，并处于栈顶的位置。对于使用standard模式的活动，系统不会在乎这个活动是否已经在返回栈中存在，每次启动都会创建该活动的一个新的实例。</li>
+</ul>
+<p><img src="/2017/05/10/Android-intent/standard.jpg" alt=""></p>
+<ul>
+<li><strong>singleTop</strong>: 当活动的启动模式指定为 singleTop，在启动活动时如果发现返回栈的栈顶已经是该活动， 则认为可以直接使用</li>
+</ul>
+<p><img src="/2017/05/10/Android-intent/singleTop.jpg" alt=""></p>
+<ul>
+<li><strong>singleTask</strong>: 当活动的启动模式指定为 singleTask，每次启动该活动时系统首先会在返回栈中检查是否存在该活动的实例，如果发现已经存在则直接使用该实例，并把在这个活动之上的所有活动统统出栈，如果没有发现就会创建一个新的活动实例。不会再创建新的活动实例。</li>
+</ul>
+<p><img src="/2017/05/10/Android-intent/singleTask.jpg" alt=""></p>
+<ul>
+<li><strong>singleInstance</strong>:  指定为 singleInstance 模式的活动会启用一个新的返回栈来管理这个活动（其实如果 singleTask模式指定了不同的 taskAffinity，也会启动一个新的返回栈)。想象以下场景，假设我们的程序中有一个活动是允许其他程序调用的， 如果我们想实现其他程序和我们的程序可以共享这个活动的实例，应该如何实现呢？使用前面三种启动模式肯定是做不到的，因为每个应用程序都会有自己的返回栈，同一个活动在不同的返回栈中入栈时必然是创建了新的实例。而使用singleInstance模式就可以解决这个问题， 在这种模式下会有一个单独的返回栈来管理这个活动，不管是哪个应用程序来访问这个活动，都共用的同一个返回栈，也就解决了共享活动实例的问题。</li>
+</ul>
+<p><img src="/2017/05/10/Android-intent/singleInstance.jpg" alt=""></p>
+<h3 id="使用显示Intent"><a href="#使用显示Intent" class="headerlink" title="使用显示Intent"></a>使用显示Intent</h3><p>点击FirstActivity的Button按钮,核心代码如下</p>
+<pre><code>button1.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(FirstActivity.this, SecondActivity.class);//&quot;意图很明显，从FirstActivity到SecondActivity&quot;
+        startActivity(intent);
+    }
+});
+</code></pre><p>并在清单文件AndroidManifest.xml对SecondActivity注册</p>
+<pre><code>&lt;application
+    android:allowBackup=&quot;true&quot;
+    android:icon=&quot;@drawable/ic_launcher&quot;
+    android:label=&quot;@string/app_name&quot;
+    android:theme=&quot;@style/AppTheme&quot; &gt;
+    &lt;activity
+        android:name=&quot;.FirstActivity&quot;
+        android:label=&quot;This is FirstActivity&quot; &gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+            &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/activity&gt;
+    &lt;activity android:name=&quot;.SecondActivity&quot; &gt;
+    &lt;/activity&gt;
+&lt;/application&gt;
+</code></pre><h3 id="隐式Intent"><a href="#隐式Intent" class="headerlink" title="隐式Intent"></a>隐式Intent</h3><p>相比于显式 Intent，隐式 Intent 并不明确指出我们想要启动哪一个活动,而是指定了一系列更为抽象的 action和 category 等信息， 然后交由系统去分析这个 Intent，并帮我们找出合适的活动去启动。</p>
+<p>通过在<code>&lt;activity&gt;</code>标签下配置<code>&lt;intent-filter&gt;</code>的内容，可以指定当前活动能够响应的 action<br>和 category，重新配置 AndroidManifest.xml，添加如下代码：</p>
+<pre><code>&lt;activity android:name=&quot;.SecondActivity&quot; &gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name=&quot;com.excel.activitytest.ACTION_START&quot; /&gt;
+        &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;
+</code></pre><p>修改 FirstActivity 中按钮的点击事件，代码如下所示：</p>
+<pre><code>button1.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        //表明我们想要启动能够响应 com.excel.activitytest.ACTION_START这个 action的活动
+        Intent intent = new Intent(&quot;com.excel.activitytest.ACTION_START&quot;);
+        startActivity(intent);
+    }
+});
+</code></pre><h3 id="使用Inent传值总结"><a href="#使用Inent传值总结" class="headerlink" title="使用Inent传值总结"></a>使用Inent传值总结</h3><ul>
+<li><p>常规方式，在FirstActivity单击按钮时用putExtra把要传的值放入Intent中，</p>
+<pre><code>public void onclick(View view) {
+    Intent intent = new Intent(FirstActivity.this, SecondActivity.class);
+    intent.putExtra(&quot;data&quot;, &quot;Liu.Heguang&quot;);//通过键值对的形式
+    startActivity(intent);
+}
+</code></pre><p>在SecondActivity通过getStringExtra方法取值</p>
+<pre><code>public class SecondActivity extends Activity {
+    private TextView tv_content;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.second_layout);
+        tv_content = (TextView) findViewById(R.id.tv_content);
+        String data = getIntent().getStringExtra(&quot;data&quot;);//通过键名取值
+        tv_content.setText(data);
+    }
+}
+</code></pre></li>
+<li><p>有时可以通过Bundle一次性传多个值</p>
+<p>在FirstActivity中传值</p>
+<pre><code>public void onclick(View view) {
+    Intent intent = new Intent(FirstActivity.this, SecondActivity.class);
+    Bundle bundle = new Bundle();//此处的bundle类此于java中的map集合
+    bundle.putInt(&quot;age&quot;, 22);//把年龄存入bundle
+    bundle.putString(&quot;name&quot;, &quot;张三&quot;);//把姓名存入bundle中
+    intent.putExtra(&quot;bundle&quot;, bundle);//把bundle放入intent意图
+    startActivity(intent);
+}
+</code></pre><p>在SecondActivity取值</p>
+<pre><code>public class SecondActivity extends Activity {
+private TextView tv_content;//定义一个TextView 对象
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.second_layout);
+        tv_content = (TextView) findViewById(R.id.tv_content);
+        Bundle bundle = getIntent().getBundleExtra(&quot;bundle&quot;);//拿到bundle对象
+        int age = bundle.getInt(&quot;age&quot;);//取值
+        String name = bundle.getString(&quot;name&quot;);
+        tv_content.setText(&quot;年龄:&quot;+age+&quot; 姓名：&quot;+name);//把取得的值显示在TextView中
+    }
+}
+</code></pre><p>效果如下：</p>
+</li>
+</ul>
+<p><img src="/2017/05/10/Android-intent/one.jpg" alt=""> <img src="/2017/05/10/Android-intent/two.jpg" alt=""></p>
+<ul>
+<li><p>有时还可以传一个javaBean 对象,<strong>前提是这个bean要实现Serializable接口</strong><br>  定义一个UserBean类如下：</p>
+<pre><code>public class UserBean implements Serializable{
+    private static final long serialVersionUID = 1L;
+    private int age;
+    private String name;
+    public UserBean(int age, String name) {
+        super();
+        this.age = age;
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;UserBean [age=&quot; + age + &quot;, name=&quot; + name + &quot;]&quot;;
+    }
+}
+</code></pre><p>在FirstActivity中传值</p>
+<pre><code>public void onclick(View view) {
+    Intent intent = new Intent(FirstActivity.this, SecondActivity.class);
+    UserBean userBean = new UserBean(22, &quot;李四&quot;);
+    intent.putExtra(&quot;userBean&quot;, userBean);
+    startActivity(intent);
+}
+</code></pre><p>在SecondActivity取值</p>
+<pre><code>public class SecondActivity extends Activity {
+    private TextView tv_content;
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            // TODO Auto-generated method stub
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.second_layout);
+            tv_content = (TextView) findViewById(R.id.tv_content);
+            UserBean userBean = (UserBean) getIntent().getSerializableExtra(&quot;userBean&quot;);
+            tv_content.setText(userBean.toString());
+        }
+}
+</code></pre><p>效果如下图：</p>
+</li>
+</ul>
+<p><img src="/2017/05/10/Android-intent/intent1.jpg" alt=""> <img src="/2017/05/10/Android-intent/intent2.jpg" alt=""> </p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-05-10</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

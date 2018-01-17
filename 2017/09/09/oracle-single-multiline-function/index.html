@@ -1,0 +1,225 @@
+<html>
+  <head>
+    <title>oracle 学习之基础篇(三)：单行函数和多行函数 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/09/oracle-multiple-table-select/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/09/oracle-order-by/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-09</div> --><!--正文的日期-->
+            oracle 学习之基础篇(三)：单行函数和多行函数
+          </h1>
+          <h3 id="单行函数：只有一个参数输入，只有一个结果输出-例如：upper-39-baidu-com-39-gt-BAIDU-COM"><a href="#单行函数：只有一个参数输入，只有一个结果输出-例如：upper-39-baidu-com-39-gt-BAIDU-COM" class="headerlink" title="单行函数：只有一个参数输入，只有一个结果输出:例如：upper(&#39;baidu.com&#39;)-&gt;BAIDU.COM"></a>单行函数：只有一个参数输入，只有一个结果输出:例如：<code>upper(&#39;baidu.com&#39;)-&gt;BAIDU.COM</code></h3><p><img src="/2017/09/09/oracle-single-multiline-function/image1.png" alt=""></p>
+<p><img src="/2017/09/09/oracle-single-multiline-function/image2.png" alt=""></p>
+<p><img src="/2017/09/09/oracle-single-multiline-function/image3.png" alt=""></p>
+<p><img src="/2017/09/09/oracle-single-multiline-function/image4.png" alt=""></p>
+<p><img src="/2017/09/09/oracle-single-multiline-function/image5.png" alt=""></p>
+<p>测试 lower/upper/initcap 函数，使用dual哑表</p>
+<pre><code>select lower(&apos;www.BAIdu.COM&apos;) from dual;
+select upper(&apos;www.BAIdu.COM&apos;) from dual;
+select initcap(&apos;www.BAIdu.COM&apos;) from dual;
+</code></pre><p>测试 concat/substr 函数，从1开始，表示字符，不论中英文</p>
+<pre><code>select concat(&apos;hello&apos;,&apos;你好&apos;) from dual;正确
+select concat(&apos;hello&apos;,&apos;你好&apos;,&apos;世界&apos;) from dual;错误
+select &apos;hello&apos; || &apos;你好&apos; || &apos;世界&apos; from dual;正确
+select concat(&apos;hello&apos;,concat(&apos;你好&apos;,&apos;世界&apos;)) from dual;正确
+select substr(&apos;hello你好&apos;,5,3) from dual;
+5表示从第几个字符开始算，第一个字符为1，中英文统一处理
+3表示连续取几个字符
+</code></pre><p>测试 length/lengthb 函数，编码方式为 UTF8/GBK(赵君)，一个中文占3/2个字节长度，一个英文一个字节</p>
+<pre><code>select length(&apos;hello你好&apos;) from dual; 
+select lengthb(&apos;hello你好&apos;) from dual; 
+</code></pre><p>测试 instr/lpad/rpad 函数，从左向右找第一次出现的位置，从1开始</p>
+<pre><code>select instr(&apos;helloworld&apos;,&apos;o&apos;) from dual;
+select LPAD(&apos;hello&apos;,10,&apos;#&apos;) from dual;
+select RPAD(&apos;hello&apos;,10,&apos;#&apos;) from dual;
+</code></pre><blockquote>
+<p>注意：找不到返回0，大小写敏感 </p>
+</blockquote>
+<p>测试 trim/replace 函数</p>
+<pre><code>select trim(&apos; &apos; from &apos;  he  ll                &apos;) from dual;
+select replace(&apos;hello&apos;,&apos;l&apos;,&apos;L&apos;) from dual;
+</code></pre><p>测试 round/trunc/mod 函数作用于数值型</p>
+<pre><code>select round(3.1415,3) from dual;
+select trunc(3.1415,3) from dual;
+select mod(10,3) from dual;
+</code></pre><p>测试 round 作用于日期型（month）</p>
+<pre><code>select round(sysdate,&apos;month&apos;) from dual;
+</code></pre><p>测试round作用于日期型（year）</p>
+<pre><code>select round(sysdate,&apos;year&apos;) from dual;
+</code></pre><p>测试trunc作用于日期型（month）</p>
+<pre><code>select trunc(sysdate,&apos;month&apos;) from dual;
+</code></pre><p>测试 trunc 作用于日期型（year）</p>
+<pre><code>select trunc(sysdate,&apos;year&apos;) from dual;
+</code></pre><p>显示昨天，今天，明天的日期，日期类型 +- 数值 = 日期类型</p>
+<pre><code>select sysdate-1 &quot;昨天&quot;,sysdate &quot;今天&quot;,sysdate+1 &quot;明天&quot; from dual;
+</code></pre><p>以年和月形式显示员工近似工龄，日期-日期=数值，假设：一年以365天计算，一月以30天计算</p>
+<pre><code>select ename &quot;姓名&quot;,round(sysdate-hiredate,0)/365 &quot;天数&quot; from emp;
+</code></pre><p>使用 months_between 函数，精确计算到年底还有多少个月</p>
+<pre><code>select months_between(&apos;31-12月-15&apos;,sysdate) from dual;
+</code></pre><p>使用 months_between 函数，以精确月形式显示员工工龄</p>
+<pre><code>select ename &quot;姓名&quot;,months_between(sysdate,hiredate) &quot;精确月工龄&quot; from emp;
+</code></pre><p>测试 add_months 函数，下个月今天是多少号</p>
+<pre><code>select add_months(sysdate,1) from dual;
+</code></pre><p>测试 add_months 函数，上个月今天是多少号</p>
+<pre><code>select add_months(sysdate,-1) from dual;
+</code></pre><p>测试 next_day 函数，从今天开始算，下一个星期三是多少号【中文平台】</p>
+<pre><code>select next_day(sysdate,&apos;星期三&apos;) from dual;
+</code></pre><p>测试 next_day 函数，从今天开始算，下下一个星期三是多少号【中文平台】</p>
+<pre><code>select next_day(next_day(sysdate,&apos;星期三&apos;),&apos;星期三&apos;) from dual;
+</code></pre><p>测试 next_day函数，从今天开始算，下一个星期三的下一个星期日是多少号【中文平台】</p>
+<pre><code>select next_day(next_day(sysdate,&apos;星期三&apos;),&apos;星期日&apos;) from dual;
+</code></pre><p>测试 last_day 函数，本月最后一天是多少号</p>
+<pre><code>select last_day(sysdate) from dual;
+</code></pre><p>测试 last_day 函数，本月倒数第二天是多少号</p>
+<pre><code>select last_day(sysdate)-1 from dual;
+</code></pre><p>测试 last_day 函数，下一个月最后一天是多少号</p>
+<pre><code>select last_day(add_months(sysdate,1)) from dual;
+</code></pre><p>测试 last_day 函数，上一个月最后一天是多少号</p>
+<pre><code>select last_day(add_months(sysdate,-1)) from dual;
+</code></pre><blockquote>
+<p>注意：1、日期-日期=天数 2、日期+-天数=日期</p>
+</blockquote>
+<h3 id="多行函数或分组函数：可有多个参数输入，只有一个结果输出：例如：count-gt-14"><a href="#多行函数或分组函数：可有多个参数输入，只有一个结果输出：例如：count-gt-14" class="headerlink" title="多行函数或分组函数：可有多个参数输入，只有一个结果输出：例如：count(*)-&gt;14"></a>多行函数或分组函数：可有多个参数输入，只有一个结果输出：例如：<code>count(*)-&gt;14</code></h3><p><img src="/2017/09/09/oracle-single-multiline-function/image6.png" alt=""></p>
+<p>统计emp表中员工总人数</p>
+<pre><code>select count(*) from emp;
+</code></pre><blockquote>
+<p>*号适用于表字段较少的情况下，如果字段较多，扫描多间多，效率低，项目中提倡使用某一个非null唯一的字段，通常是主键 </p>
+</blockquote>
+<p>统计公司有多少个不重复的部门</p>
+<pre><code>select count(distinct deptno) from emp;
+</code></pre><p>统计有佣金的员工人数</p>
+<pre><code>select count(comm) from emp;
+</code></pre><blockquote>
+<p>注意：多行函数，不统计NULL值</p>
+</blockquote>
+<p>员工总工资，平均工资，四舍五入，保留小数点后0位</p>
+<pre><code>select sum(sal) &quot;总工资&quot;,round(avg(sal),0) &quot;平均工资&quot; from emp;
+</code></pre><p>查询员工表中最高工资，最低工资</p>
+<pre><code>select max(sal) &quot;最高工资&quot;,min(sal) &quot;最低工资&quot; from emp;
+</code></pre><p>入职最早，入职最晚员工</p>
+<pre><code>select max(hiredate) &quot;最晚入职时间&quot;,min(hiredate) &quot;最早入职时间&quot; from emp;
+</code></pre><p>按部门求出该部门平均工资，且平均工资取整数，采用截断</p>
+<pre><code>select deptno &quot;部门编号&quot;,trunc(avg(sal),0) &quot;部门平均工资&quot;
+from emp
+group by deptno;
+</code></pre><p>(继续)查询部门平均工资大于2000元的部门</p>
+<pre><code>select deptno &quot;部门编号&quot;,trunc(avg(sal),0) &quot;部门平均工资&quot;
+from emp
+group by deptno
+having trunc(avg(sal),0) &gt; 2000; 
+</code></pre><p>(继续)按部门平均工资降序排列</p>
+<pre><code>select deptno &quot;部门编号&quot;,trunc(avg(sal),0) &quot;部门平均工资&quot;
+from emp
+group by deptno
+having trunc(avg(sal),0) &gt; 2000
+order by 2 desc;
+</code></pre><p>除10号部门外，查询部门平均工资大于2000元的部门，方式一【having deptno&lt;&gt;10】</p>
+<pre><code>select deptno,avg(sal)
+from emp
+group by deptno
+having deptno&lt;&gt;10;
+</code></pre><p>除10号部门外，查询部门平均工资大于2000元的部门，方式二【where deptno&lt;&gt;10】提倡</p>
+<pre><code>select deptno,avg(sal)
+from emp
+where deptno&lt;&gt;10
+group by deptno;
+</code></pre><p>显示部门平均工资的最大值[多行函数的嵌套]</p>
+<pre><code>select max(avg(sal)) &quot;部门平均工资的最大值&quot;
+from emp
+group by deptno;
+</code></pre><p>思考：显示部门平均工资的最大值和该部门编号?</p>
+<pre><code>select max(avg(sal)) &quot;部门平均工资的最大值&quot;,deptno &quot;部门编号&quot;
+from emp
+group by deptno
+having avg(sal) = (
+                    select max(avg(sal)) 
+                    from emp
+                    group by deptno
+                    );
+</code></pre><p>group by 子句的细节：</p>
+<ul>
+<li>在select子句中出现的非多行函数的所有列，【必须】出现在group by子句中</li>
+</ul>
+<ul>
+<li>在group by子句中出现的所有列，【可出现可不现】在select子句中</li>
+</ul>
+<p><img src="/2017/09/09/oracle-single-multiline-function/image7.png" alt=""></p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-09</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

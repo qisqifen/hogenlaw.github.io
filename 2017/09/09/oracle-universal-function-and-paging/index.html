@@ -1,0 +1,164 @@
+<html>
+  <head>
+    <title>oracle 学习之基础篇(五)：通用函数 条件判断函数 分页 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/23/oracle-create-table-and-constraint/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/09/oracle-multiple-table-select/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-09</div> --><!--正文的日期-->
+            oracle 学习之基础篇(五)：通用函数 条件判断函数 分页
+          </h1>
+          <h3 id="通用函数-条件判断函数"><a href="#通用函数-条件判断函数" class="headerlink" title="通用函数 条件判断函数"></a>通用函数 条件判断函数</h3><p>使用 NVL(a,b) 通用函数，统计员工年收入，NVL() 作用于任何类型，即(number/varchar2/date)<br>通用函数：参数类型可以是 number 或 varchar2 或 date 类型</p>
+<pre><code>select ename,sal*12+NVL(comm,0) from emp;
+</code></pre><p>使用NVL2(a,b,c)通用函数，如果a不为 NULL，取 b 值，否则取 c 值，统计员工年收入 </p>
+<pre><code>select ename,sal*12+NVL2(comm,comm,0) from emp;
+</code></pre><p>使用 NULLIF(a,b)通用函数，在类型一致的情况下，如果 a 与 b 相同，返回 NULL，否则返回 a，比较10和10.0是否相同</p>
+<pre><code>select NULLIF(10,&apos;10&apos;) from dual;
+</code></pre><p>使用 SQL99标准通用语法中的case 表达式，将职位是分析员的，工资+1000；职位是经理的，工资+800；职位是其它的，工资+400</p>
+<pre><code>case 字段 
+     when 条件1 then 表达式1
+     when 条件2 then 表达式2
+     else 表达式n
+end 
+
+select ename &quot;姓名&quot;,job &quot;职位&quot;,sal &quot;涨前工资&quot;,
+       case job
+        when &apos;ANALYST&apos; then sal+1000
+        when &apos;MANAGER&apos; then sal+800
+            else sal+400
+       end &quot;涨后工资&quot;
+from emp; 
+</code></pre><p>使用oracle专用语法中的decode()函数，职位是分析员的，工资+1000；职位是经理的，工资+800；职位是其它的，工资+400</p>
+<pre><code>decode(字段,条件1,表达式1,条件2,表达式2,...表达式n)
+select ename &quot;姓名&quot;,job &quot;职位&quot;,sal &quot;涨前工资&quot;,
+       decode(job,&apos;ANALYST&apos;,sal+1000,&apos;MANAGER&apos;,sal+800,sal+400) &quot;涨后工资&quot;
+from emp; 
+</code></pre><p><img src="/2017/09/09/oracle-universal-function-and-paging/image1.png" alt=""></p>
+<hr>
+<h3 id="oracle-分页"><a href="#oracle-分页" class="headerlink" title="oracle 分页"></a>oracle 分页</h3><p>回顾mysql分页<br>用limit关键字 </p>
+<p>查询users表中前二条记录</p>
+<pre><code>select * from users limit 0,2
+或 
+select * from users limit 2;
+</code></pre><blockquote>
+<p>0表示第一条记录的索引号，索引号从0开始 2表示最多选取二个记录</p>
+</blockquote>
+<p>查询出users前三条记录</p>
+<pre><code>select * from users limit 0,3
+或
+select * from users limit 3
+</code></pre><p>查询出users第2条到第4条记录</p>
+<pre><code>select * from users limit 1,3; 
+</code></pre><p>什么是rownum，有何特点</p>
+<p>1）rownum是oracle专用的关健字</p>
+<p>2）rownum与表在一起，表亡它亡,表在它在 </p>
+<p>3）rownum在默认情况下，从表中是查不出来的</p>
+<p>4）只有在select子句中，明确写出rownum才能显示出来</p>
+<p>5）rownum是number类型，且唯一连续</p>
+<p>6）rownum最小值是1，最大值与你的记录条数相同</p>
+<p>7）rownum也能参与关系运算</p>
+<ul>
+<li>rownum = 1    有值</li>
+<li>rownum &lt; 5    有值    </li>
+<li>rownum &lt;=5    有值         </li>
+<li>rownum &gt; 2    无值        </li>
+<li>rownum &gt;=2    无值</li>
+<li>rownum &lt;&gt;2    有值    与  rownum &lt; 2 相同</li>
+<li>rownum = 2    无值</li>
+</ul>
+<p>8）基于rownum的特性，我们通常rownum只用于&lt;或&lt;=关系运算   </p>
+<p>显示emp表中3-8条记录（方式一：使用集合减运算）</p>
+<pre><code>select rownum &quot;伪列&quot;,emp.* from emp where rownum&lt;=8
+minus
+select rownum,emp.* from emp where rownum&lt;=2;
+</code></pre><p>显示emp表中3-8条记录（方式二：使用子查询，在from子句中使用，重点）</p>
+<pre><code>select xx.*
+from (select rownum ids,emp.* from emp where rownum&lt;=8) xx 
+where ids&gt;=2;
+注意：在子查询中的别名，不可加&quot;&quot;引号
+</code></pre><p>显示emp表中5-9条记录</p>
+<pre><code>select yy.*
+from (select rownum ids,emp.* from emp where rownum&lt;=9) yy
+where ids&gt;=5;
+</code></pre><blockquote>
+<p>注意:在项目中，from后台可能有真实表名，也可能用子查询看作的表名，同时真实表和子查询看作的表要做连接查询</p>
+</blockquote>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-09</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

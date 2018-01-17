@@ -1,0 +1,163 @@
+<html>
+  <head>
+    <title>oracle 学习之基础篇(六)：创建表和约束 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/23/oracle-CRUD/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/09/oracle-universal-function-and-paging/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-23</div> --><!--正文的日期-->
+            oracle 学习之基础篇(六)：创建表和约束
+          </h1>
+          <p>使用 oracleSQL，创建用户表 users ( id 整型 name 字符串 birthday 日期 sal 整型，默认今天)</p>
+<pre><code>create table user(
+  id number(5) primary key,
+  name varchar2(8) not null unique,
+  sal number(6,2) not null,
+  birthday date default sysdate
+);
+</code></pre><blockquote>
+<p>number(6,2)：其中2表示最多显示2位小数，采用四舍五入，不足位数补0，其中6表示小数+整数不多于6位，其中整数位数不得多于4位，可以等于4位</p>
+</blockquote>
+<ul>
+<li>CLOB【Character Large OBject】：大文本对象，即超过65565字节的数据对象，最多存储4G</li>
+<li>BLOB【Binary Large OBject】：大二进制对象，即图片，音频，视频，最多存储4G</li>
+</ul>
+<p>将 user 表重命名 users</p>
+<pre><code>rename user to users;
+</code></pre><p>给表字段重命名</p>
+<pre><code>alter table users rename COLUMN sal to salary
+</code></pre><p>增加表字段</p>
+<pre><code>alter table users add (age number(5))
+</code></pre><p>添加字段注释</p>
+<pre><code>comment on column users.age is &apos;年龄&apos;
+</code></pre><p>删除表列</p>
+<pre><code>alter table users drop COLUMN age commit
+</code></pre><p>修改字段类型</p>
+<pre><code>alter table users modify age varchar2(5)
+</code></pre><blockquote>
+<p>注意：修改表时，不会影响表中原有的数据</p>
+<p>做完上述操作后可用 <code>commit</code> 命令提交</p>
+</blockquote>
+<p>删除表</p>
+<pre><code>drop table users;
+</code></pre><p>查询回收站中的对象</p>
+<pre><code>show recyclebin;
+</code></pre><p>闪回，即将回收站还原</p>
+<pre><code>flashback table 表名 to before drop;
+flashback table 表名 to before drop rename to  新表名;
+</code></pre><p>彻底删除users表</p>
+<pre><code>drop table users purge;
+</code></pre><p>清空回收站</p>
+<pre><code>purge recyclebin;
+</code></pre><p>创建表 customers(单)和 orders (多)，使用 primary key/not null/unique/default/foreign key 约束<br>要体现【on delete cascade/on delete set null】</p>
+<p>需求：删除客户，级联删除他所有的订单 <code>delete from customers where id = 1</code>;</p>
+<p>需求：删除客户，不级联删除他所有的订单，只是将外健设置为NULL<code>delete from customers where id = 1</code>;</p>
+<p>customers 表的创建和数据的插入</p>
+<pre><code>create table customers(
+  id number(3) primary key,
+  name varchar2(4) not null unique
+);
+insert into customers(id,name) values(1,&apos;A&apos;);
+insert into customers(id,name) values(2,&apos;B&apos;);
+</code></pre><p>orders 表的创建和数据插入(使用约束)</p>
+<pre><code>create table orders(
+  id number(3) primary key,
+  isbn varchar2(6) not null unique,
+  price number(3) not null,
+  cid number(3),
+  --constraint cid_FK foreign key(cid) references customers(id) on delete cascade 
+  constraint cid_FK foreign key(cid) references customers(id) on delete set null  
+);
+insert into orders(id,isbn,price,cid) values(1,&apos;isbn10&apos;,10,1);
+insert into orders(id,isbn,price,cid) values(2,&apos;isbn20&apos;,20,1);
+insert into orders(id,isbn,price,cid) values(3,&apos;isbn30&apos;,30,2);
+insert into orders(id,isbn,price,cid) values(4,&apos;isbn40&apos;,40,2);
+</code></pre><p>创建表 students，包括id,name,gender,salary字段，使用check约束【性别只能是男或女，薪水介于6000到8000之间】</p>
+<pre><code>create table students(
+  id number(3) primary key,
+  name varchar2(4) not null unique,
+  gender varchar2(2) not null check ( gender in (&apos;男&apos;,&apos;女&apos;) ),
+  salary number(6) not null check ( salary between 6000 and 8000 )
+);
+insert into students(id,name,gender,salary) values(1,&apos;哈哈&apos;,&apos;中&apos;,6000);错
+insert into students(id,name,gender,salary) values(2,&apos;呵呵&apos;,&apos;男&apos;,5000);错
+insert into students(id,name,gender,salary) values(3,&apos;嘻嘻&apos;,&apos;女&apos;,7000);对
+</code></pre>
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-23</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

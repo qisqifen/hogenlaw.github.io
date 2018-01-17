@@ -1,0 +1,214 @@
+<html>
+  <head>
+    <title>oracle学习之基础篇(八)：事务和视图 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/23/oracle-sequence-Index/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/23/oracle-CRUD/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-23</div> --><!--正文的日期-->
+            oracle学习之基础篇(八)：事务和视图
+          </h1>
+          <h3 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h3><p>什么是事务：一个不可分割的子操作形成一个整体，该整体要么全部执行成功，要么全部执行失败。例如：转帐</p>
+<p>为什么要用事务：如果不用事务的话，为转帐为例，可能出现一个用户钱增加了，另一个用户钱不变</p>
+<blockquote>
+<p>在编程中事务放在业务层</p>
+</blockquote>
+<p>在 jdbc编程中，用如下方式使用事务</p>
+<pre><code>...
+connection.setAutoCommit(false);
+pstmt.executeUpdate();
+connection.commit();
+connection.rollback();
+</code></pre><p>在 hibernate 编程中，用如下方式使用事务</p>
+<pre><code>...
+transaction.begin();
+session.save(new User());
+transaction.commit();
+transaction.rollback();
+...
+</code></pre><blockquote>
+<p>Oracle 的事务只针对 DM L操作，即 select/insert/update/delete</p>
+<p>Oracle 的事务开始：第一条DML操作做为事务开始</p>
+<p>在 MySQL 中，事务开始：start transaction</p>
+</blockquote>
+<p>Oracle 的提交事务</p>
+<ul>
+<li>显示提交：commit    </li>
+<li>隐藏提交：DDL/DCL/exit(sqlplus工具)<blockquote>
+<p>注意：提交是的从事务开始到事务提交中间的内容，提交到ORCL数据库中的DBF二进制文件</p>
+</blockquote>
+</li>
+</ul>
+<p>Oracle的回滚事务<br>（1）显示回滚：rollback<br>（2）隐藏回滚：关闭窗口(sqlplus工具)，死机，掉电</p>
+<blockquote>
+<p>回滚到事务开始的地方</p>
+</blockquote>
+<p>什么是回滚点：在操作之间设置的一个标志位，用于将来回滚之用</p>
+<p>使用savepoint 回滚点，设置回滚点a    </p>
+<pre><code>savepoint a;
+</code></pre><p>使用rollback to savepoint，回滚到回滚点a处</p>
+<pre><code>rollback to savepoint a;
+</code></pre><blockquote>
+<p>如果没有设置回滚点的话，Oracle必须回滚到事务开始的地方，其间做的一个正确的操作也将撤销</p>
+<p>Oracle 提交或回滚后，原来设置的回滚点无效了</p>
+<p>Oracle之所以能回滚的主要机制是实例池 </p>
+</blockquote>
+<p><img src="/2017/09/23/oracle-transaction-view/image1.png" alt=""></p>
+<h3 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h3><p>什么是视图【View】 </p>
+<ul>
+<li>视图是一种虚表 </li>
+<li>视图建立在已有表的基础上, 视图赖以建立的这些表称为基表</li>
+<li>向视图提供数据内容的语句为 SELECT 语句,可以将视图理解为存储起来的 SELECT 语句</li>
+<li>视图向用户提供基表数据的另一种表现形式</li>
+<li>视图没有存储真正的数据，真正的数据还是存储在基表中</li>
+<li>程序员虽然操作的是视图，但最终视图还会转成操作基表</li>
+<li>一个基表可以有0个或多个视图 </li>
+</ul>
+<p>什么情况下会用到视图</p>
+<ul>
+<li>如果你不想让用户看到所有数据（字段，记录），只想让用户看到某些的数据时，此时可以使用视图</li>
+<li>当你需要减化SQL查询语句的编写时，可以使用视图，但不提高查询效率</li>
+</ul>
+<p>视图应用领域：银行，电信，金属，证券军事等不便让用户知道所有数据的项目中</p>
+<p>视图的作用</p>
+<ul>
+<li>限制数据访问</li>
+<li>简化复杂查询</li>
+<li>提供数据的相互独立</li>
+<li>同样的数据，可以有不同的显示方式</li>
+</ul>
+<p>基于 emp 表所有列，创建视图 <code>emp_view_1</code></p>
+<pre><code>create view emp_view_1
+as
+select * from emp;
+</code></pre><p>默认情况下，普通用户无权创建视图，得让 sysdba 为你分配 creare view 的权限 以sysdba身份，授权 scott用户 create view权限</p>
+<pre><code>grant create view to scott;
+</code></pre><p>以 sysdba 身份，撤销 scott 用户 create view 权限</p>
+<pre><code>revoke create view from scott;
+</code></pre><p>基于 emp 表指定列，创建视图 <code>emp_view_2</code>，该视图包含编号/姓名/工资/年薪/年收入（查询中使用列别名）</p>
+<pre><code>create view emp_view_2
+as
+select empno &quot;编号&quot;,ename &quot;姓名&quot;,sal &quot;工资&quot;,sal*12 &quot;年薪&quot;,sal*12+NVL(comm,0) &quot;年收入&quot;
+from emp;
+</code></pre><p>基于 emp 表指定列，创建视图 <code>emp_view_3(a,b,c,d,e)</code>，包含编号/姓名/工资/年薪/年收入（视图中使用列名）</p>
+<pre><code>create view emp_view_3(a,b,c,d,e)
+as
+select empno &quot;编号&quot;,ename &quot;姓名&quot;,sal &quot;工资&quot;,sal*12 &quot;年薪&quot;,sal*12+NVL(comm,0) &quot;年收入&quot;
+from emp;
+</code></pre><p>查询 <code>emp_view_3</code> 创建视图的结构</p>
+<pre><code>desc emp_view_3;
+</code></pre><p>修改 <code>emp_view_3(id,name,salary,annual,income)</code>视图</p>
+<pre><code>create or replace view emp_view_3(id,name,salary,annual,income)
+as
+select empno &quot;编号&quot;,ename &quot;姓名&quot;,sal &quot;工资&quot;,sal*12 &quot;年薪&quot;,sal*12+NVL(comm,0) &quot;年收入&quot;
+from emp;
+</code></pre><p>查询 emp 表，求出各部门的最低工资，最高工资，平均工资</p>
+<pre><code>select min(sal),max(sal),round(avg(sal),0),deptno
+from emp
+group by deptno;
+</code></pre><p>创建视图 <code>emp_view_4</code>，视图中包含各部门的最低工资，最高工资，平均工资</p>
+<pre><code>create or replace view emp_view_4
+as
+select deptno &quot;部门号&quot;,min(sal) &quot;最低工资&quot;,max(sal) &quot;最高工资&quot;,round(avg(sal),0) &quot;平均工资&quot;
+from emp
+group by deptno;
+</code></pre><p>创建视图 emp_view_5，视图中包含员工编号，姓名，工资，部门名，工资等级</p>
+<pre><code>create or replace view emp_view_5
+as
+select e.empno &quot;编号&quot;,e.ename &quot;姓名&quot;,e.sal &quot;工资&quot;,d.dname &quot;部门名&quot;,s.grade &quot;工资等级&quot;
+from emp e,dept d,salgrade s
+where (e.deptno=d.deptno) and (e.sal between s.losal and s.hisal);
+</code></pre><p>删除视图 emp_view_1 中的7788号员工的记录，使用 delete 操作，会影响基表吗</p>
+<pre><code>delete from emp_view_1 where empno=7788;写法正确，会影响基表
+</code></pre><p>修改<code>emp_view_1</code>为只读视图【with read only】，再执行上述d elete操作，还行吗？</p>
+<pre><code>create or replace view emp_view_1
+as
+select * from emp
+with read only;
+不能进行delete操作了
+</code></pre><blockquote>
+<p>删除视图中的【某条】记录会影响基表</p>
+<p>将【整个】视图删除，不会影响表</p>
+<p>删除视图，不会进入回收站</p>
+<p>删除基表会影响视图</p>
+<p>闪回基表后,视图没有影响</p>
+</blockquote>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-23</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

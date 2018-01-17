@@ -1,0 +1,272 @@
+<html>
+  <head>
+    <title>oracle 学习之基础篇(四)：多表查询 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/09/oracle-universal-function-and-paging/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/09/oracle-single-multiline-function/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-09</div> --><!--正文的日期-->
+            oracle 学习之基础篇(四)：多表查询
+          </h1>
+          <p>员工表emp和部门表dept的笛卡尔集（笛卡尔集表=列数之和，行数之积，笛卡尔集表内中有些数据是不符合要求的）</p>
+<pre><code>select emp.ename,dept.dname
+from emp,dept;
+</code></pre><p>使用等值连接/内连接（只能使用=号），显示员工的编号，姓名，部门名，使用表别名简化</p>
+<pre><code>select emp.empno,emp.ename,dept.dname,dept.deptno
+from emp,dept
+where emp.deptno = dept.deptno;
+</code></pre><p>使用非等值连接（不能使用=号，其它符号可以，例如：&gt;=，&lt;=，&lt;&gt;，betwen and等），显示员工的编号，姓名，月薪，工资级别</p>
+<pre><code>select e.empno,e.ename,e.sal,s.grade
+from emp e,salgrade s
+where e.sal between s.losal and s.hisal;
+</code></pre><blockquote>
+<p>内连接查询：只能查询出符合条件的记录</p>
+<p>外连接查询：既能查询出符合条件的记录，也能根据一方强行将另一个方查询出来</p>
+</blockquote>
+<p>使用外连接，按部门10,20,30,40号，统计各部门员工人数，要求显示部门号，部门名，人数</p>
+<pre><code>部门号 部门名        人数
+
+10     ACCOUNTING    3 
+20     RESEARCH      5
+30     SALES         6
+40     OPERATIONS    0
+
+左外连接[是oracle专用的，不是SQL99规则]：
+select dept.deptno &quot;部门号&quot;,dept.dname &quot;部门名&quot;,count(emp.empno) &quot;人数&quot;
+from dept,emp
+where dept.deptno = emp.deptno(+) 
+group by dept.deptno,dept.dname;
+
+右外连接：
+select dept.deptno &quot;部门号&quot;,dept.dname &quot;部门名&quot;,count(emp.empno) &quot;人数&quot;
+from dept,emp
+where emp.deptno(+) = dept.deptno
+group by dept.deptno,dept.dname;
+</code></pre><blockquote>
+<p>等值连接/非等值连接/内连接：只会查询出多张表中，根据某个字段匹配，符合条件的记录，不符合条件的记录是不会存在的</p>
+</blockquote>
+<p>使用左外连接，按部门10,20,30,40号，统计各部门员工人数，要求显示部门号，部门名，人数，且按人数降序排列</p>
+<pre><code>select dept.deptno &quot;部门号&quot;,dept.dname &quot;部门名&quot;,count(emp.empno) &quot;人数&quot;
+from dept,emp
+where dept.deptno = emp.deptno(+) 
+group by dept.deptno,dept.dname
+order by 3 desc;
+</code></pre><p>使用自连接，显示”SMITH的上级是FORD”这种格式</p>
+<pre><code>select users.ename || &apos;的上级是&apos; ||boss.ename
+from emp users,emp boss
+where users.mgr = boss.empno;
+--只有13条记录，不含有KING
+</code></pre><p>基于上述问题，将KING的上级是“”显示出来</p>
+<pre><code>select users.ename || &apos;的上级是&apos; ||boss.ename
+from emp users,emp boss
+where users.mgr = boss.empno(+);
+14条记录
+--注意：自连接也用到内连接和外连接
+</code></pre><hr>
+<h3 id="oracle-子查询"><a href="#oracle-子查询" class="headerlink" title="oracle 子查询"></a>oracle 子查询</h3><p>查询工资比WARD高的员工信息</p>
+<p>第一：查询WARD的工资?<code>select sal from emp where ename = &#39;WARD&#39;;</code></p>
+<p>第二：查询工资比1250高的员工信息？<code>select * from emp where sal &gt; 1250;</code></p>
+<p>子查询：</p>
+<pre><code>select * 
+from emp 
+where sal &gt; (
+    select sal 
+    from emp 
+    where ename = &apos;WARD&apos;
+);
+</code></pre><p>查询部门名为’SALES’的员工信息（方式一：子查询）</p>
+<p>第一：查询部门名为’SALES’的编号？<code>select deptno from dept where dname = &#39;SALES&#39;;</code></p>
+<p>第二：查询部门号为30的员工信息？ <code>select * from emp where deptno = 30;</code></p>
+<p>子查询：</p>
+<pre><code>select * 
+from emp 
+where deptno = (
+select deptno 
+from dept 
+where dname = &apos;SALES&apos;
+);
+</code></pre><p>查询部门名为’SALES’的员工信息（方式二：多表查询）</p>
+<pre><code>select emp.*
+from dept,emp
+where (dept.deptno=emp.deptno) and (dept.dname=&apos;SALES&apos;); 
+</code></pre><p>查询每个员工编号,姓名，部门名,工资等级（三表查询，这三张表并无外健关联）</p>
+<pre><code>select e.empno,e.ename,d.dname,s.grade
+from emp e,dept d,salgrade s
+where (e.deptno=d.deptno) and (e.sal between s.losal and s.hisal);
+</code></pre><p>查询工资最低的员工信息（单行子查询，使用=号）</p>
+<p>第一：查询出工资最低是多少？<code>select min(sal) from emp;</code></p>
+<p>第二：查询工资为800的员工信息？<code>select * from emp where sal = 800;</code></p>
+<p>子查询：</p>
+<pre><code>select * 
+from emp 
+where sal = (
+      select min(sal) 
+      from emp
+    );
+</code></pre><p>查询部门名为’ACCOUNTING’或’SALES’的员工信息（多行子查询，使用in关键字）</p>
+<p>第一：查询部门名为’ACCOUNTING’或’SALES’的部门编号？<code>select deptno from dept where dname in (&#39;ACCOUNTING&#39;,&#39;SALES&#39;);</code></p>
+<p>第二：查询部门号为10或30号的员工信息？<code>select * from emp where deptno in (10,30);</code></p>
+<p>子查询：</p>
+<pre><code>select * 
+from emp 
+where deptno in (
+                   select deptno 
+                   from dept 
+                   where dname in (&apos;ACCOUNTING&apos;,&apos;SALES&apos;)
+               );
+</code></pre><p>查询工资比20号部门【任意any】一个员工工资【低&lt;】的员工信息（多行子查询，使用any关键字） </p>
+<p>第一：查询20号部门的所有工资？<code>select sal from emp where deptno = 20;</code></p>
+<p>第二：查询工资比(800,2975,3000,1100,3000)任意一个低的员工信息？<code>select * from emp where sal &lt; any (800,2975,3000,1100,3000);</code></p>
+<blockquote>
+<p>在oracle看来，&lt;any就等于&lt;集合中最大的那个值</p>
+</blockquote>
+<p>子查询：</p>
+<pre><code>select * 
+from emp 
+where sal &lt;any (
+              select sal 
+              from emp 
+              where deptno = 20
+            ); 
+</code></pre><p>查询工资比30号部门【所有all】员工【低&lt;】的员工信息（多行子查询，使用all关键字） </p>
+<p>第一：查询出30部门所有员工的工资？<code>select sal from emp where deptno = 30;</code></p>
+<p>第二：查询工资比(1600,1250,1250,2850,1500,950)中所有的工资都低的员工信息？<code>select * from emp where sal &lt;all (1600,1250,1250,2850,1500,950);</code></p>
+<p>子查询：</p>
+<pre><code>select * 
+from emp 
+where sal &lt;all (
+              select sal 
+              from emp 
+              where deptno = 30
+            );
+</code></pre><hr>
+<h3 id="oracle-集合查询"><a href="#oracle-集合查询" class="headerlink" title="oracle 集合查询"></a>oracle 集合查询</h3><p>使用并集运算，查询20号部门或30号部门的员工信息</p>
+<pre><code>select * from emp where deptno = 20
+union
+select * from emp where deptno = 30;
+注意：
+union：二个集合中，如果都有相同的，取其一
+union all：二个集合中，如果都有相同的，都取
+</code></pre><p>使用set time/timing on，打开时间的开关</p>
+<pre><code>set time on;
+set time off;
+</code></pre><p>使用set tim/timing off，关闭时间的开关</p>
+<pre><code>set timing on;
+set timint off;
+</code></pre><p>使用交集运算[intersect]，查询工资在1000-2000和1500-2500之间的员工信息（方式一）</p>
+<pre><code>select * from emp where sal between 1000 and 2000
+intersect
+select * from emp where sal between 1500 and 2500;
+</code></pre><p>用where行过滤，查询工资在1000-2000和1500-2500之间的员工信息（方式二）</p>
+<pre><code>select * 
+from emp
+where (sal between 1000 and 2000) and (sal between 1500 and 2500);
+</code></pre><p>使用差集运算[minus]，查询工资在1000-2000，但不在1500-2500之间的员工信息（方式一）</p>
+<pre><code>select * from emp where sal between 1000 and 2000
+minus
+select * from emp where sal between 1500 and 2500;
+</code></pre><p>使用where行过滤，查询工资在1000-2000，但不在1500-2500之间的员工信息（方式二）</p>
+<pre><code>select * 
+from emp 
+where (sal between 1000 and 2000) and (sal not between 1500 and 2500);
+</code></pre><p>集合查询的细节：</p>
+<p>1）集合操作时，必须确保集合列数是相等</p>
+<pre><code>select empno,ename,sal,comm from emp where deptno = 20
+union
+select empno,ename,sal from emp where deptno = 30;错
+</code></pre><p>2）集合操作时，必须确保集合列类型对应相同</p>
+<pre><code>select empno,ename,sal,comm from emp where deptno = 20
+union
+select empno,ename,sal,hiredate from emp where deptno = 30;错
+</code></pre><p>3）A union B union C = C union B union A</p>
+<pre><code>select * from emp where deptno = 10
+union
+select * from emp where deptno = 20
+union
+select * from emp where deptno = 30;
+</code></pre><p>4）当多个集合操作时，结果的列名由第一个集合列名决定</p>
+<pre><code>select empno &quot;编号&quot;,ename &quot;姓名&quot;,sal &quot;薪水&quot; from emp where deptno = 20
+union
+select empno,ename,sal from emp where deptno = 10;
+</code></pre><blockquote>
+<p>当多表查询，子查询，集合查询都能完成同样任务时，按如下优化方案选择：多表查询-&gt;子查询-&gt;集合查询</p>
+</blockquote>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-09</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

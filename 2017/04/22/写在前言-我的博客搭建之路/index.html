@@ -1,0 +1,198 @@
+<html>
+  <head>
+    <title>写在前言--我的博客搭建之路 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/04/23/博客搭建之路-在博客中引用图片和音乐/'>
+        ‹
+      </a>
+    </div>
+  
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-04-22</div> --><!--正文的日期-->
+            写在前言--我的博客搭建之路
+          </h1>
+          <p> 虽然网上有很多搭建博客的教程，但是为了搭建我心目中的那种博客的样式，还是走了很多弯路，先看看我搭好的吧：<a href="http://hogenlaw.com" target="_blank" rel="noopener">http://hogenlaw.com</a>。也许是先入为主的原因吧，我喜欢这种极简的博客风格样式，看过<a href="http://stormzhang.com/" target="_blank" rel="noopener">stormzhang博客</a>的朋友都知道，他博客的风格也是类似这种样式，但是他这是基于 GitHub + Jekyll，而 Jekyll 貌似要有 Ruby 的环境，貌似比较麻烦(没去试)，为了避免折腾现在一般都是 GitHub + Hexo 来搭建自由博客，相关资料也比较多。</p>
+<p> 其实自去年开始我就在 CSDN上写写笔记，虽然自己还是个菜B，很多人说 CSDN 是个过气的网站，但我的确有许多不懂的问题都是在 CSDN 上得到解答的。17年开始我就想试着自己搭建一个博客，想着记录自己的技术成长轨迹，也顺道这看能否提高自己的写作水平，于是乎，百度 + google 轮番上，结果成是成功了，但那种 Hexo的样式还不是我认为的极简风格，中间各种原因，也几乎没在上面写内容，今天索性就重新搭建，感谢这位<a href="https://smartbeng.github.io/2017/03/26/blogFinish/" target="_blank" rel="noopener">兄台的博客</a>，记录的比较详细，正是有了前人的不断总结，才有了后来人的少走弯路。所以搭建成功后，我也试着记录一下自己的历程。</p>
+<p> 我这其实也是重复造轮子，我也不一定写的比别人好，但是我尽我所能把搭建的过程给记录下来，算是博客搭建的一次总结吧！</p>
+<h3 id="安装-Node-js-和-Git"><a href="#安装-Node-js-和-Git" class="headerlink" title="安装 Node.js 和 Git"></a>安装 Node.js 和 Git</h3><p><a href="https://nodejs.org/dist/v6.10.2/node-v6.10.2-x86.msi" target="_blank" rel="noopener">windows 32 位安装包下载地址</a></p>
+<p><a href="https://nodejs.org/dist/v4.4.3/node-v4.4.3-x64.msi" target="_blank" rel="noopener">windows 64 位安装包下载地址</a></p>
+<p><a href="https://git-scm.com/download/" target="_blank" rel="noopener">Git官网下载地址</a></p>
+<blockquote>
+<p>至于软件的安装这没什么要讲的，就下一步 下一步搞定！</p>
+</blockquote>
+<h3 id="注册-GitHub"><a href="#注册-GitHub" class="headerlink" title="注册 GitHub"></a>注册 GitHub</h3><p>这个还真没啥好说的</p>
+<p><img src="/2017/04/22/写在前言-我的博客搭建之路/github.png" alt="github"></p>
+<h3 id="设置检查-SSH"><a href="#设置检查-SSH" class="headerlink" title="设置检查 SSH"></a>设置检查 SSH</h3><ul>
+<li><p>首先我们需要检查本机是否安装 ssh：电脑桌面–&gt;右键–&gt;<code>git bash here</code>,键入如下命令</p>
+<pre><code>$ ssh
+</code></pre></li>
+<li><p>如果结果类似如下所示则说明本机已经装了SSH，没有的话自行安装</p>
+<p>  <img src="/2017/04/22/写在前言-我的博客搭建之路/ssh01.png" alt="ssh01.png"></p>
+</li>
+<li><p>生成SSH key：电脑桌面–&gt;右键–&gt;<code>git bash here</code>,键入如下命令</p>
+<pre><code>$ ssh-keygen -t rsa
+</code></pre><p>接着连续三个回车键（不需要输入密码），然后就会生成两个文件 id_rsa 和 id_rsa.pub ，而 id_rsa 是密钥，id_rsa.pub 就是公钥。这两文件默认分别在如下目录里生成：<br>wind系统在 /c/Users/username/.ssh 下(MAC没用过，不知道，呵呵！)</p>
+</li>
+</ul>
+<p>接下来要做的是把 id_rsa.pub 的内容添加到 GitHub 上，这样你本地的 id_rsa 密钥跟 GitHub 上的 id_rsa.pub 公钥进行配对，授权成功才可以提交代码。</p>
+<h3 id="GitHub-上添加-SSH-key"><a href="#GitHub-上添加-SSH-key" class="headerlink" title="GitHub 上添加 SSH key"></a>GitHub 上添加 SSH key</h3><p>第一步先在 GitHub 上的设置页面，点击最左侧 SSH and GPG keys ：<br><img src="/2017/04/22/写在前言-我的博客搭建之路/ssh.png" alt=""><br>然后点击右上角的 New SSH key 按钮：<br><img src="/2017/04/22/写在前言-我的博客搭建之路/ssh2.png" alt=""></p>
+<blockquote>
+<p>windows用户可以用Sublime Text或EditPlus打开id_rsa.pub 文件的内容</p>
+</blockquote>
+<p>SSH key 添加成功之后，输入 <code>ssh -T git@github.com</code> 进行测试，如果出现以下提示证明添加成功了。<br><img src="/2017/04/22/写在前言-我的博客搭建之路/ssh3.png" alt=""></p>
+<h3 id="使用GitHub-建立博客"><a href="#使用GitHub-建立博客" class="headerlink" title="使用GitHub 建立博客"></a>使用GitHub 建立博客</h3><p>登录github，点击+号下拉框「New Repository」</p>
+<p>填写Repository信息：</p>
+<p>Repository name：userName.github.io 注意：userName为你的github用户名</p>
+<p>Description (optional)： Writing 1000 Words a Day Changed My Life –描述</p>
+<blockquote>
+<p>Github Pages 的 Repository 名字是特定（两个要一致）的，比如我 Github 账号是 hogenlaw，那么我Github Pages Repository（GitHub仓库）名字就是 hogenlaw.github.io。</p>
+</blockquote>
+<p>点击「Create Repository」 完成创建</p>
+<h3 id="安装Hexo-注意前方高能！"><a href="#安装Hexo-注意前方高能！" class="headerlink" title="安装Hexo(注意前方高能！)"></a>安装Hexo(注意前方高能！)</h3><p>首先在「我的电脑」中任意选择一个盘新建「myblog」文件夹 , 比如我在建在 D 盘：</p>
+<ul>
+<li><p>桌面右键git bash here打开 git , 运行Hexo 安装命令</p>
+<pre><code>$ npm install -g hexo
+</code></pre></li>
+<li><p>进入到 myblog 目录下</p>
+<pre><code>$ hexo init
+</code></pre></li>
+<li><p>好，到现在已经搭建起来一个本地博客了 , 输入以下命令验证</p>
+<pre><code>$ hexo g –生成静态文件
+
+$ hexo s –启动服务本地预览 （预览完要停止键盘按下 Ctrl + C 停止本地预览）
+</code></pre><p>然后到浏览器输入localhost:4000看看 , 一个初始博客映入眼帘</p>
+<h3 id="更换-hexo-scribble-极简博客主题"><a href="#更换-hexo-scribble-极简博客主题" class="headerlink" title="更换 hexo-scribble 极简博客主题"></a>更换 hexo-scribble 极简博客主题</h3><p>上面你看到的是默认的hexo主题，现在准备更换成极简的 hexo-scribble 主题了</p>
+</li>
+</ul>
+<ol>
+<li><code>$ hexo clean</code> –因为主题换了 你需要clean以下老主题生成的缓存</li>
+<li><p>下载 hexo-scribble 主题</p>
+<pre><code>$ git clone https://github.com/hogenlaw/hexo-scribble.git
+</code></pre></li>
+<li>解压，将 hexo-scribble 文件夹复制到 myblog\themes目录下</li>
+<li>配置复制的主题: 修改 myblog 目录下的 config.yml 配置文件中的 theme 属性，将其设置为hexo-scribble(修改config.yml前最好将其备份一下)</li>
+<li><p>启用主题: 从myblog的根目录进入你复制的主题目录,右键 <code>git bash here</code>，敲如下命令，一个不能少</p>
+<pre><code>$ cd themes/hexo-scribble
+
+$ git pull
+
+$ hexo g   --生成
+
+$ hexo s   --启动本地预览
+</code></pre><p>操作完之后浏览器输入 localhost:4000 看一下有没有</p>
+<h3 id="写新文章"><a href="#写新文章" class="headerlink" title="写新文章"></a>写新文章</h3><pre><code>$ hexo new &quot;postName&quot; #新建文章
+$ hexo new page &quot;pageName&quot; #新建页面
+</code></pre><blockquote>
+<p>文章默认是一个.md的格式 , 意思它用的是 Markdown 语法 , markdown，没有哪个程序员不会的吧，csdn就是这种语法来写的！</p>
+</blockquote>
+</li>
+</ol>
+<p>写完之后 Ctrl + S 保存</p>
+<h3 id="在本地预览自己写的博客或者增加后的博客"><a href="#在本地预览自己写的博客或者增加后的博客" class="headerlink" title="在本地预览自己写的博客或者增加后的博客"></a>在本地预览自己写的博客或者增加后的博客</h3><ul>
+<li>首先在命令窗口切换回 myblog 目录下</li>
+<li>然后再 hexo g（生成网页） 接着hexo s（启动本地服务）,浏览器查看效果（ localhost:4000 ）</li>
+</ul>
+<h3 id="一键部署博客到-GitHub，包括主题与新写的文章-放大招了"><a href="#一键部署博客到-GitHub，包括主题与新写的文章-放大招了" class="headerlink" title="一键部署博客到 GitHub，包括主题与新写的文章[放大招了]"></a>一键部署博客到 GitHub，包括主题与新写的文章[放大招了]</h3><ol>
+<li><p>进入 myblog 的根目录右键<code>git bash here</code> 接着操作以下命令(替换你的用户名)：</p>
+<pre><code>$ git clone https://github.com/你的github用户名/你的github用户名.github.io.git .deploy/你的github用户名.github.io
+</code></pre></li>
+<li><p>接着在 myblog 根目录下创建一个 .txt 文件 , 把下面的命令复制进去(替换你的用户名)</p>
+<pre><code>hexo generate
+cp -R public/* .deploy/你的github用户名.github.io
+cd .deploy/你的github用户名.github.io
+git add .
+git commit -m “update”
+git push origin master
+</code></pre></li>
+<li>将这个 .txt 文件的后缀改成 .sh , 它就变成了脚本文件 , 我们就将文件改成 deploy.sh 吧！意思就是部署</li>
+</ol>
+<blockquote>
+<p>如果你以前没登录过 github，第一次点击deploy.sh的时候会有弹出框提示输入 GitHub 的用户名跟密码</p>
+</blockquote>
+<h3 id="推送到GitHub"><a href="#推送到GitHub" class="headerlink" title="推送到GitHub"></a>推送到GitHub</h3><ul>
+<li><p>你的主题改完还没有推送到GitHub , 所以你需要在 git 命令窗口先进入主题目录 myblog/themes/hexo-scribble , 运行如下命令:</p>
+<pre><code>$ cd themes/hexo-scribble
+$ git pull  
+$ hexo g  --生成本地（主题）
+</code></pre></li>
+<li><p>接着切回到 myblog 的根目录下输入下面的生成命令</p>
+<pre><code>$ hexo g
+</code></pre></li>
+<li><p>最后一步 , 发布</p>
+<p>  双击我们刚在Hexo 目录下编辑的 deploy.sh 脚本文件,弹出一个黑窗口，进行同步，发布，时间会有延迟，不急，等窗口消失后，在浏览器输入 <a href="https://username.github.io" target="_blank" rel="noopener">https://username.github.io</a></p>
+<blockquote>
+<p>也就是说：以后你发布博客只需要两步 , myblog 根目录下 运行 hexo g , 之后点击 depploy.sh 脚本！</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="PS-在这篇文章之后，我还写了篇如何同步博客到-github和Coding，我觉得这很有必要，毕竟-github国内访问比较慢，有兴趣也可以参考参考"><a href="#PS-在这篇文章之后，我还写了篇如何同步博客到-github和Coding，我觉得这很有必要，毕竟-github国内访问比较慢，有兴趣也可以参考参考" class="headerlink" title="PS: 在这篇文章之后，我还写了篇如何同步博客到 github和Coding，我觉得这很有必要，毕竟 github国内访问比较慢，有兴趣也可以参考参考"></a>PS: 在这篇文章之后，我还写了篇如何<a href="http://hogenlaw.com/2017/04/23/%E6%8A%8A%E5%8D%9A%E5%AE%A2%E5%90%8C%E6%97%B6%E9%83%A8%E7%BD%B2%E5%88%B0github%E5%92%8Ccoding%E4%B8%8A/" target="_blank" rel="noopener">同步博客到 github和Coding</a>，我觉得这很有必要，毕竟 github国内访问比较慢，有兴趣也可以参考参考</h4><hr>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="298" height="52" src="//music.163.com/outchain/player?type=2&id=5330971&auto=1&height=32"></iframe>
+          <br>
+<p>hogen</p>
+<div class='date'>2017-04-22</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

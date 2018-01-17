@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <title>把博客同时部署到github和coding上 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/04/24/foreach-in-AndroidStudio/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/04/23/博客搭建之路-在博客中引用图片和音乐/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-04-23</div> --><!--正文的日期-->
+            把博客同时部署到github和coding上
+          </h1>
+          <p> 说实话，写这个着实比较辛苦，为了搭个博客，看了不知道多少别人的文章，也是折腾的够呛，但不管怎样还是算成功了；话说回来，至于为什么要托管到 coding 上，原因大家也应该能猜到，就是github访问速度偏慢，体验不是很好，不说了，直接进入正题。</p>
+<h3 id="注册-coding-net-账号并创建项目"><a href="#注册-coding-net-账号并创建项目" class="headerlink" title="注册 coding.net 账号并创建项目"></a>注册 coding.net 账号并创建项目</h3><p>项目名最好跟用户名一样</p>
+<p><img src="/2017/04/23/把博客同时部署到github和coding上/coding.png" alt=""></p>
+<h3 id="设置-coding-SSH-KEY"><a href="#设置-coding-SSH-KEY" class="headerlink" title="设置 coding SSH KEY"></a>设置 coding SSH KEY</h3><p>这个就用当时设置github的一样就行了</p>
+<p><img src="/2017/04/23/把博客同时部署到github和coding上/coding2.png" alt=""></p>
+<h3 id="config-yml配置"><a href="#config-yml配置" class="headerlink" title="_config.yml配置"></a>_config.yml配置</h3><pre><code>deploy:
+  type: git
+  repo: 
+        github: git@github.com:hogenlaw/hogenlaw.github.io.git,master
+        coding: git@git.coding.net:hogenlaw/hogenlaw.git,master
+</code></pre><blockquote>
+<p>替换你的项目名，注意空格，我这儿用的是ssh，而不是https</p>
+</blockquote>
+<h3 id="部署项目到-coding上"><a href="#部署项目到-coding上" class="headerlink" title="部署项目到 coding上"></a>部署项目到 coding上</h3><ul>
+<li><p>进入 myblog 根目录下，先敲如下命令。为了使用hexo d来部署到git上</p>
+<pre><code>$ npm install hexo-deployer-git --save
+</code></pre></li>
+<li><p>使用部署命令就能把博客同步到 coding 上面</p>
+<pre><code>hexo deploy -g
+</code></pre></li>
+</ul>
+<h3 id="pages服务方式部署"><a href="#pages服务方式部署" class="headerlink" title="pages服务方式部署"></a>pages服务方式部署</h3><p> 部署博客方式有两种，第一种就是pages服务的方式，也推荐这种方式，因为可以绑定域名，而第二种演示的方式必须升级会员才能绑定自定义域名。pages方式也很简单就是在source/需要创建一个空白文件，至于原因，是因为 coding.net需要这个文件来作为以静态文件部署的标志。就是说看到这个Staticfile就知道按照静态文件来发布。</p>
+<pre><code>cd source/
+touch Staticfile  #名字必须是Staticfile
+</code></pre><h3 id="个人域名绑定-注意圈起来的部分"><a href="#个人域名绑定-注意圈起来的部分" class="headerlink" title="个人域名绑定(注意圈起来的部分)"></a>个人域名绑定(注意圈起来的部分)</h3><p><img src="/2017/04/23/把博客同时部署到github和coding上/DNS.png" alt=""></p>
+<blockquote>
+<p>注意github绑定需要在 myblog/source目录下建一 CNAME 文件，并写上你购买的域名，域名我是在阿里万网买的；我当时按照别人的做法写的默认和海外，这样发现只能访问 coding 上的博客而不能访问 github 上的博客了</p>
+</blockquote>
+<h3 id="coding-绑定私有域名"><a href="#coding-绑定私有域名" class="headerlink" title="coding 绑定私有域名"></a>coding 绑定私有域名</h3><p><img src="/2017/04/23/把博客同时部署到github和coding上/coding3.png" alt=""></p>
+<h3 id="发布博客新文章后直接部署到-github-和-coding"><a href="#发布博客新文章后直接部署到-github-和-coding" class="headerlink" title="发布博客新文章后直接部署到 github 和 coding"></a>发布博客新文章后直接部署到 github 和 coding</h3><pre><code>$ hexo g -d
+</code></pre><p>比如笔者的博客：</p>
+<p>github: <a href="https://hogenlaw.github.io" target="_blank" rel="noopener">https://hogenlaw.github.io</a></p>
+<p>coding: <a href="http://hogenlaw.coding.me" target="_blank" rel="noopener">http://hogenlaw.coding.me</a></p>
+<p>绑定域名后：</p>
+<p><a href="http://hogenlaw.com" target="_blank" rel="noopener">http://hogenlaw.com</a></p>
+<p>参考：<a href="http://www.cnblogs.com/tengj/p/5352572.html" target="_blank" rel="noopener">http://www.cnblogs.com/tengj/p/5352572.html</a></p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-04-23</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

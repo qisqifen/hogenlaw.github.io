@@ -1,0 +1,378 @@
+<html>
+  <head>
+    <title>plsql 学习第一弹 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/09/28/plsql-learning-2/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/09/23/oracle-sequence-Index/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-09-27</div> --><!--正文的日期-->
+            plsql 学习第一弹
+          </h1>
+          <h3 id="SQL99是什么"><a href="#SQL99是什么" class="headerlink" title="SQL99是什么"></a>SQL99是什么</h3><ol>
+<li>是操作所有关系型数据库的规则</li>
+<li>是第四代语言</li>
+<li>是一种结构化查询语言</li>
+<li>只需发出合法合理的命令，就有对应的结果显示</li>
+</ol>
+<h3 id="SQL-的特点"><a href="#SQL-的特点" class="headerlink" title="SQL 的特点"></a>SQL 的特点</h3><ol>
+<li>交互性强，非过程化</li>
+<li>数据库操纵能力强，只需发送命令，无需关注如何实现</li>
+<li>多表操作时，自动导航简单，例如：<code>select emp.empno,emp.sal,dept.dname from emp,dept
+where emp.deptno = dept.deptno</code></li>
+<li>容易调试，错误提示，直接了当</li>
+<li>SQL强调结果 </li>
+</ol>
+<h3 id="PLSQL-是什么"><a href="#PLSQL-是什么" class="headerlink" title="PLSQL 是什么"></a>PLSQL 是什么</h3><p> 是专用于 Oracle 服务器，在 SQL 基础之上，添加了一些过程化控制语句，叫 PLSQL,过程化包括有：类型定义，判断，循环，游标，异常或例外处理。。。PLSQL强调过程</p>
+<h3 id="为什么要用-PLSQL"><a href="#为什么要用-PLSQL" class="headerlink" title="为什么要用 PLSQL"></a>为什么要用 PLSQL</h3><p>因为SQL是第四代命令式语言，无法显示处理过程化的业务，所以得用一个过程化程序设计语言来弥补SQL的不足之处，SQL和PLSQL不是替代关系，是弥补关系        </p>
+<h3 id="PLSQL-程序的完整组成结构如下："><a href="#PLSQL-程序的完整组成结构如下：" class="headerlink" title="PLSQL 程序的完整组成结构如下："></a>PLSQL 程序的完整组成结构如下：</h3><pre><code>[declare]
+     变量声明;
+   变量声明;
+begin
+     DML/TCL操作;
+ DML/TCL操作;
+[exception]
+     例外处理;
+ 例外处理;
+end;
+/
+</code></pre><blockquote>
+<p>注意：在PLSQL程序中，’;’号表示每条语句的结束，/表示整个PLSQL程序结束</p>
+</blockquote>
+<p><img src="/2017/09/27/plsql-learning-1/img1.png" alt=""></p>
+<hr>
+<p>写一个PLSQL程序，输出”hello world”字符串，<strong>语法：dbms_output.put_line(‘需要输出的字符串’);</strong></p>
+<pre><code>begin
+    --向SQLPLUS客户端工具输出字符串
+    dbms_output.put_line(&apos;hello 你好&apos;);
+end;
+/
+</code></pre><blockquote>
+<p><code>dbms_output</code>是 oracle 中的一个输出对象,<code>put_line</code> 是上述对象的一个方法，用于输出一个字符串自动换行 </p>
+</blockquote>
+<p>设置显示PLSQL程序的执行结果，默认情况下，不显示PLSQL程序的执行结果，<strong>语法：set</strong> </p>
+<pre><code>serveroutput on/off;
+set serveroutput on;
+</code></pre><p>使用基本类型变量,常量和注释，求10+100的和</p>
+<pre><code>declare
+    --定义变量
+    mysum number(3) := 0;
+    tip varchar2(10) := &apos;结果是&apos;;
+begin
+    /*业务算法*/   
+    mysum := 10 + 100;
+    /*输出到控制器*/
+    dbms_output.put_line(tip || mysum);
+end;
+/
+</code></pre><p>输出7369号员工姓名和工资，格式如下：7369号员工的姓名是SMITH,薪水是800，<strong>语法：使用表名.字段%type</strong></p>
+<pre><code>declare
+    --定义二个变量，分别装姓名和工资
+    pename emp.ename%type;
+    psal   emp.sal%type;
+begin  
+    --SQL语句
+    --select ename,sal from emp where empno = 7369;
+    --PLSQL语句，将ename的值放入pename变量中，sal的值放入psal变量中    
+    select ename,sal into pename,psal from emp where empno = 7369;
+    --输出
+    dbms_output.put_line(&apos;7369号员工的姓名是&apos;||pename||&apos;,薪水是&apos;||psal);    
+end;
+/
+</code></pre><p>输出7788号员工姓名和工资，格式如下：7788号员工的姓名是SMITH,薪水是3000，<strong>语法：使用表名%rowtype</strong></p>
+<pre><code>declare
+    emp_record emp%rowtype;
+begin
+    select * into emp_record from emp where empno = 7788;
+    dbms_output.put_line(&apos;7788号员工的姓名是&apos;||emp_record.ename||&apos;,薪水是&apos;||emp_record.sal);
+end;
+/
+</code></pre><p><img src="/2017/09/27/plsql-learning-1/img2.png" alt=""></p>
+<hr>
+<p>使用 if-else-end if 显示今天星期几，是”工作日”还是”休息日”</p>
+<pre><code>declare
+    pday varchar2(10);
+begin
+    select to_char(sysdate,&apos;day&apos;) into pday from dual;
+    dbms_output.put_line(&apos;今天是&apos;||pday);
+    if pday in (&apos;星期六&apos;,&apos;星期日&apos;) then
+    dbms_output.put_line(&apos;休息日&apos;);
+    else
+    dbms_output.put_line(&apos;工作日&apos;);
+    end if;
+end;
+/
+</code></pre><p>从键盘接收值，使用 if-elsif-else-end if 显示”age&lt;16”，”age&lt;30”，”age&lt;60”，”age&lt;80”</p>
+<pre><code>declare
+    age number(3) := &amp;age;
+begin
+    if age &lt; 16 then
+       dbms_output.put_line(&apos;你未成人&apos;);
+    elsif age &lt; 30 then
+       dbms_output.put_line(&apos;你青年人&apos;);
+    elsif age &lt; 60 then
+       dbms_output.put_line(&apos;你奋斗人&apos;);
+    elsif age &lt; 80 then 
+       dbms_output.put_line(&apos;你享受人&apos;);
+    else
+       dbms_output.put_line(&apos;未完再继&apos;);
+    end if;
+end;
+/
+</code></pre><hr>
+<p>使用 loop 循环显示 1-10</p>
+<pre><code>declare
+    i number(2) := 1;
+begin
+    loop
+        --当i&gt;10时，退出循环
+        exit when i&gt;10;
+        --输出i的值
+        dbms_output.put_line(i);
+        --变量自加
+        i := i + 1;  
+    end loop;
+end;
+/
+</code></pre><p>使用 while 循环显示 1-10</p>
+<pre><code>declare
+    i number(2) := 1;
+begin
+    while i&lt;11 
+    loop
+        dbms_output.put_line(i);
+        i := i + 1;
+    end loop;
+end;
+/
+</code></pre><p>使用 while 循环，向 emp 表中插入 999 条记录</p>
+<pre><code>declare
+    i number(4) := 1;
+begin 
+    while( i &lt; 1000 )
+    loop
+        insert into emp(empno,ename) values(i,&apos;哈哈&apos;);
+        i := i + 1;
+    end loop;   
+end;
+/
+</code></pre><p>使用 while 循环，从emp表中删除 999 条记录</p>
+<pre><code>declare
+    i number(4) := 1;
+begin 
+    while i&lt;1000
+    loop
+        delete from emp where empno = i;
+        i := i + 1;
+    end loop;
+end;
+/
+</code></pre><p>使用 for 循环显示 20-30</p>
+<pre><code>declare
+    i number(2) := 20;
+begin
+    for i in 20 .. 30
+    loop
+        dbms_output.put_line(i);
+    end loop;
+end;
+/
+</code></pre><hr>
+<h3 id="什么是光标-游标-cursor"><a href="#什么是光标-游标-cursor" class="headerlink" title="什么是光标/游标/cursor"></a>什么是光标/游标/cursor</h3><p>类似于JDBC 中的 ResultSet 对象的功能，从上向下依次获取每一记录的内容</p>
+<p>使用无参光标 cursor，查询所有员工的姓名和工资【如果需要遍历多条记录时，使用光标 cursor，无记录找到使用 cemp%notfound】</p>
+<pre><code>declare
+    --定义游标
+    cursor cemp is select ename,sal from emp;
+    --定义变量
+    vename emp.ename%type;
+    vsal   emp.sal%type;
+begin
+    --打开游标，这时游标位于第一条记录之前
+    open cemp;
+    --循环
+    loop
+       --向下移动游标一次
+       fetch cemp into vename,vsal; 
+       --退出循环,当游标下移一次后，找不到记录时，则退出循环
+       exit when cemp%notfound;
+       --输出结果
+       dbms_output.put_line(vename||&apos;--------&apos;||vsal);
+    end loop;
+    --关闭游标
+    close cemp;
+end;
+/
+</code></pre><p>使用带参光标 cursor，查询10号部门的员工姓名和工资</p>
+<pre><code>declare
+    cursor cemp(pdeptno emp.deptno%type) is select ename,sal from emp where deptno=pdeptno;
+    pename emp.ename%type;
+    psal emp.sal%type; 
+begin 
+    open cemp(&amp;deptno);
+    loop
+        fetch cemp into pename,psal;     
+        exit when cemp%notfound;
+        dbms_output.put_line(pename||&apos;的薪水是&apos;||psal);
+    end loop;
+    close cemp;
+end;
+/
+</code></pre><p>使用无参光标 cursor，真正给员工涨工资，ANALYST 涨1000，MANAGER 涨800，其它涨400，要求显示编号，姓名，职位，薪水</p>
+<pre><code>declare
+    cursor cemp is select empno,ename,job,sal from emp;
+    pempno emp.empno%type;
+    pename emp.ename%type;
+    pjob   emp.job%type;
+    psal   emp.sal%type;
+begin
+    open cemp;
+    loop
+        fetch cemp into pempno,pename,pjob,psal;
+        --循环退出条件一定要写
+        exit when cemp%notfound;
+        if pjob=&apos;ANALYST&apos; then
+            update emp set sal = sal + 1000 where empno = pempno;
+        elsif pjob=&apos;MANAGER&apos; then
+            update emp set sal = sal + 800 where empno = pempno;
+        else 
+        update emp set sal = sal + 400 where empno = pempno;
+        end if;
+    end loop;
+    commit;
+    close cemp;
+end;
+/
+</code></pre><hr>
+<p>使用 oracle 系统内置例外，演示除0例外【zero_divide】</p>
+<pre><code>declare
+    myresult number;
+begin
+    myresult := 1/0;
+    dbms_output.put_line(myresult);
+exception
+    when zero_divide then 
+     dbms_output.put_line(&apos;除数不能为0&apos;);
+     delete from emp;  
+end;
+/
+</code></pre><p>使用 oracle 系统内置例外，查询100号部门的员工姓名，演示没有找到数据 【no_data_found】</p>
+<pre><code>declare
+    pename varchar2(20);
+begin
+    select ename into pename from emp where deptno = 100;
+    dbms_output.put_line(pename);
+exception
+    when NO_DATA_FOUND then 
+     dbms_output.put_line(&apos;查无该部门员工&apos;);
+     insert into emp(empno,ename) values(1111,&apos;ERROR&apos;);
+end;
+/
+</code></pre><p>使用用户自定义例外，使用光标 cursor，查询10/20/30/100 号部门的员工姓名，演示没有找到数据【nohave_emp_found】</p>
+<pre><code>declare
+    cursor cemp(pdeptno number) is select ename from emp where deptno = pdeptno;
+    pename emp.ename%type;
+    nohave_emp_found exception;--自定义例外
+begin
+    --打开游标，这时游标位于第一条记录之前
+    open cemp(10);
+    --向下移动游标一次，指向第一条记录
+    fetch cemp into pename;
+    --判断
+    if cemp%notfound then
+        --抛异常
+        raise nohave_emp_found;
+    else
+        --输出变量pename的值
+        dbms_output.put_line(pename);
+        loop
+            --向下移动游标一次，指向第二条记录
+            fetch cemp into pename；
+            --如果找不到记录的话就退出
+            exit when cemp%notfound;
+            --输出变量Pename的值
+            dbms_output.put_line(pename);
+        end loop;
+    end if;
+    close cemp;
+exception
+    when nohave_emp_found then dbms_output.put_line(&apos;查无此部门门员工&apos;);
+end;
+/
+</code></pre>
+          <br>
+<p>hogen</p>
+<div class='date'>2017-09-27</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

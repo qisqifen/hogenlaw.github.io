@@ -1,0 +1,740 @@
+<html>
+  <head>
+    <title>Android 开发知识点总结 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/05/25/list-adapter/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/05/10/Android-intent/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-05-10</div> --><!--正文的日期-->
+            Android 开发知识点总结
+          </h1>
+          <p>很可能下一份工作就不是从事 Android 了，在做 Android 开发的这段时期里还是总结了很多的基础知识的，惭愧，本人目前还是菜B一枚，还没有达到研究源码发表一些牛掰尔尔，无论是博客还是其它的笔记都是一些基础的内容知识点，我总是相信再高深的知识如果基础不牢也没法去拥有掌握，如下罗列都是自己在开发中遇到的一些琐屑知识点，是写给自己看的，当然很多都可以从网上查到，我只不过做了个归纳、整理，方便查阅。如果看客觉得有用，不用客气，觉得没用，也不要咒骂，抱怨！</p>
+<h3 id="直接复制项目需要注意："><a href="#直接复制项目需要注意：" class="headerlink" title="直接复制项目需要注意："></a>直接复制项目需要注意：</h3><ul>
+<li>要改动的地方<ul>
+<li>项目名字</li>
+<li>应用包名</li>
+<li>重新导入R文件</li>
+</ul>
+</li>
+</ul>
+<h3 id="广播-BroadcastReceiver"><a href="#广播-BroadcastReceiver" class="headerlink" title="广播(BroadcastReceiver)"></a>广播(BroadcastReceiver)</h3><ul>
+<li>是继承自 BroadcastReceiver 的， 并重写了父类的 onReceive()方法</li>
+<li>动态注册的广播接收器一定都要取消注册才行</li>
+<li>发送有序广播 sendOrderedBroadcast(intent, null);</li>
+<li>既然已经获得了接收广播的优先权，那么 MyBroadcastReceiver 就可以选择是否允许广<br>播继续传递了 abortBroadcast();</li>
+<li><p>为了能够简单地解决广播的安全性问题，Android引入了一套本地广播机制，使用这个<br>机制发出的广播只能够在应用程序的内部进行传递， 并且广播接收器也只能接收来自本应用<br>程序发出的广播，这样所有的安全性问题就都不存在了</p>
+<pre><code>@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    localBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+    Button button = (Button) findViewById(R.id.button);
+    button.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(&quot;com.excel.localbroadcast.LOCAL_BROADCAST&quot;);
+            localBroadcastManager.sendBroadcast(intent);
+        }
+    });
+    intentFilter = new IntentFilter();
+    intentFilter.addAction(&quot;com.excel.localbroadcast.LOCAL_BROADCAST&quot;);
+    localReceiver = new LocalReceiver();
+    localBroadcastManager.registerReceiver(localReceiver, intentFilter);
+}
+</code></pre><p>另外还有一点需要说明，本地广播是无法通过静态注册的方式来接收的。其实这也完全可以理解，因为静态注册主要就是为了让程序在未启动的情况下也能收到广播，而发送本地广播时，我们的程序肯定是已经启动了，因此也完全不需要使用静态注册的功能。使用本地广播的几点优势。</p>
+</li>
+</ul>
+<blockquote>
+<blockquote>
+<ol>
+<li>可以明确地知道正在发送的广播不会离开我们的程序， 因此不需要担心机密数据泄<br>漏的问题。</li>
+<li>其他的程序无法将广播发送到我们程序的内部， 因此不需要担心会有安全漏洞的隐<br>患。</li>
+<li>发送本地广播比起发送系统全局广播将会更加高效。</li>
+</ol>
+</blockquote>
+</blockquote>
+<h3 id="Android中主要提供了三种方法用于得到-SharedPreferences对象"><a href="#Android中主要提供了三种方法用于得到-SharedPreferences对象" class="headerlink" title="Android中主要提供了三种方法用于得到 SharedPreferences对象"></a>Android中主要提供了三种方法用于得到 SharedPreferences对象</h3><ul>
+<li><p>Context 类中的 getSharedPreferences() 方法</p>
+<pre><code>SharedPreferences sp = context.getSharedPreferences(&quot;ip&quot;, Context.MODE_PRIVATE);
+</code></pre></li>
+<li><p>Activity类中的 getPreferences() 方法</p>
+<pre><code>SharedPreferences sp = getSharedPreferences(&quot;ip&quot;, MODE_PRIVATE);
+</code></pre></li>
+<li><p>PreferenceManager 类中的 getDefaultSharedPreferences() 方法</p>
+<pre><code>button.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        SharedPreferences.Editor editor = getSharedPreferences(&quot;data&quot;,MODE_PRIVATE).edit();
+        editor.putString(&quot;name&quot;, &quot;Tom&quot;);
+        editor.putInt(&quot;age&quot;, 28);
+        editor.putBoolean(&quot;married&quot;, false);
+        editor.commit();
+    }
+});
+</code></pre></li>
+</ul>
+<hr>
+<h3 id="SQLite创建表"><a href="#SQLite创建表" class="headerlink" title="SQLite创建表"></a>SQLite创建表</h3><pre><code>create table Book (
+id integer primary key autoincrement,
+author text,
+price real,
+pages integer,
+name text)
+</code></pre><blockquote>
+<p> integer 表示整型,real表示浮点型，text 表示文本类型，blob 表示二进制类型</p>
+</blockquote>
+<h3 id="使用cmd命令查看表"><a href="#使用cmd命令查看表" class="headerlink" title="使用cmd命令查看表"></a>使用cmd命令查看表</h3><ul>
+<li>在环境变量里配置plant-tools路径</li>
+<li>打开cmd,输入adb shell,进入手机存储目录</li>
+<li>cd /data/data/com.lhg.sqlitedatabase/databases路径下</li>
+<li>sqlite3 数据库名.db –&gt;查看数据库</li>
+<li>.table –&gt;查看数据库中所有表</li>
+<li><p>pragma table_info(表名) –&gt;查看表的数据结构</p>
+<blockquote>
+<p>输入.mode line命令切换显示模式，然后重新运行pragma命令</p>
+</blockquote>
+</li>
+<li><p>.schema –&gt;查看建表语句</p>
+</li>
+<li><p>.exit –&gt;退出</p>
+<h3 id="使用SQL基本语句操作数据库"><a href="#使用SQL基本语句操作数据库" class="headerlink" title="使用SQL基本语句操作数据库"></a>使用SQL基本语句操作数据库</h3><pre><code>public void insert() {
+    // 如果数据库不存在,先创建数据库,再获取可读可写的数据库对象,如果数据库存在,就直接打开
+    db.execSQL(&quot;insert into person(name, salary,phone)values(?,?,?)&quot;, new Object[] { &quot;张三&quot;, &quot;5000&quot;, 1384700 });
+    db.execSQL(&quot;insert into person(name, salary,phone)values(?,?,?)&quot;, new Object[] { &quot;李四&quot;, 200, 1872093 });
+    db.execSQL(&quot;insert into person(name, salary,phone)values(?,?,?)&quot;, new Object[] { &quot;王五&quot;, 10000, 1322093 });
+    db.execSQL(&quot;insert into person(name, salary,phone)values(?,?,?)&quot;, new Object[] { &quot;李毅&quot;, 100, 1312093 });
+}
+
+public void delete() {
+    db.execSQL(&quot;delete from person where name=?&quot;, new Object[] { &quot;张三&quot; });
+}
+
+public void update() {
+    db.execSQL(&quot;update person set salary=? where name=?&quot;, new Object[] { 20000, &quot;王五&quot; });
+}
+
+public void select() {
+    Cursor cursor = db.rawQuery(&quot;select * from person&quot;, null);
+    while (cursor.moveToNext()) {
+        String name = cursor.getString(cursor.getColumnIndex(&quot;name&quot;));
+        String salary = cursor.getString(cursor.getColumnIndex(&quot;salary&quot;));
+        String phone = cursor.getString(cursor.getColumnIndex(&quot;phone&quot;));
+        System.out.println(name + &quot;---&gt;&quot; + salary + &quot;--&gt;&quot; + phone);
+    }
+}
+</code></pre><h3 id="使用android提供的api操作数据库"><a href="#使用android提供的api操作数据库" class="headerlink" title="使用android提供的api操作数据库"></a>使用android提供的api操作数据库</h3><pre><code>// 使用Api插入数据库
+public void insertApi() {
+    ContentValues values = new ContentValues();
+    // 第一个属性必须和数据库中字段对应
+    values.put(&quot;name&quot;, &quot;刘文勇&quot;);
+    values.put(&quot;salary&quot;, 2500);
+    values.put(&quot;phone&quot;, 110);
+    db.insert(&quot;person&quot;, null, values);
+}
+
+// 使用api删改数据库
+public void deleteApi() {
+    // 如果数据库中有多个name相同的对象,可以用以下方式来指定,
+    int i = db.delete(&quot;person&quot;, &quot;name=? and _id=?&quot;, new String[] { &quot;张三&quot;, &quot;3&quot; });
+    System.out.println(i);
+}
+
+public void updateApi() {
+    ContentValues values = new ContentValues();
+    values.put(&quot;phone&quot;, 119);
+    int i = db.update(&quot;person&quot;, values, &quot;name=?&quot;, new String[] { &quot;张三&quot; });
+    System.out.println(i);
+}
+
+public void selectApi() {
+    Cursor cursor = db.query(&quot;person&quot;, null, null, null, null, null, null);
+    while (cursor.moveToNext()) {
+        String name = cursor.getString(cursor.getColumnIndex(&quot;name&quot;));
+        String salary = cursor.getString(cursor.getColumnIndex(&quot;salary&quot;));
+        String phone = cursor.getString(cursor.getColumnIndex(&quot;phone&quot;));
+        System.out.println(name + &quot;--&gt;&quot; + salary + &quot;--&gt;&quot; + phone);
+    }
+}
+</code></pre></li>
+</ul>
+<h3 id="事务-经典例子-银行转账"><a href="#事务-经典例子-银行转账" class="headerlink" title="事务,经典例子,银行转账"></a>事务,经典例子,银行转账</h3><pre><code>public void transaction() {
+    try {
+        // 开启事务
+        db.beginTransaction();
+        ContentValues values = new ContentValues();
+        values.put(&quot;salary&quot;, 9000);
+        db.update(&quot;person&quot;, values, &quot;name=?&quot;, new String[] { &quot;李四&quot; });
+
+        values.clear();// 建议写上
+        values.put(&quot;salary&quot;, 6000);
+        db.update(&quot;person&quot;, values, &quot;name=?&quot;, new String[] { &quot;杨文&quot; });
+        // int i = 3/0;//事务不执行
+        // 设置 事务执行成功
+        db.setTransactionSuccessful();
+    } finally {
+        // 关闭事务,同时提交,如果已经设置事务执行成功,那么sql语句就生效了,反之,sql语句回滚
+        db.endTransaction();
+    }
+}
+</code></pre><h3 id="装载布局的三种方式"><a href="#装载布局的三种方式" class="headerlink" title="装载布局的三种方式"></a>装载布局的三种方式</h3><pre><code>View view = getLayoutInflater().inflate(R.layout.add_black_number, null);
+View view =LayoutInflater.from(this).inflate(R.layout.add_black_number, null);
+View view = View.inflate(this, R.layout.add_black_number,null);
+</code></pre><h3 id="访问assets目录下的文件的路径写法-比如数据库"><a href="#访问assets目录下的文件的路径写法-比如数据库" class="headerlink" title="访问assets目录下的文件的路径写法(比如数据库)"></a>访问assets目录下的文件的路径写法(比如数据库)</h3><pre><code>//路径
+private static final String PATH=&quot;data/data/com.excel.mobileSafe/files/address.db&quot;
+//拿到数据库对象
+SQLiteDatabase database = SQLiteDatabase.openDatabase(PATH,null,SQLiteDatabase.OPEN_READONLY)
+</code></pre><h3 id="ListView适配器通过构造方法关联MainActivity"><a href="#ListView适配器通过构造方法关联MainActivity" class="headerlink" title="ListView适配器通过构造方法关联MainActivity"></a>ListView适配器通过构造方法关联MainActivity</h3><pre><code>private List&lt;String&gt; mData;
+private LayoutInflater mInflater;
+public  ListViewAdapter(Context context,List&lt;String&gt; mData) {
+    // TODO Auto-generated constructor stub
+    this.mData = mData;
+    mInflater = LayoutInflater.from(context);
+}
+</code></pre><h3 id="TextView、EditText默认是不可以点击的，设置属性"><a href="#TextView、EditText默认是不可以点击的，设置属性" class="headerlink" title="TextView、EditText默认是不可以点击的，设置属性"></a>TextView、EditText默认是不可以点击的，设置属性</h3><pre><code>android:clickable=&quot;true&quot;
+</code></pre><h3 id="两个界面切换的动画"><a href="#两个界面切换的动画" class="headerlink" title="两个界面切换的动画"></a>两个界面切换的动画</h3><pre><code>overridePendingTransition()
+</code></pre><h3 id="设置图片没有背景"><a href="#设置图片没有背景" class="headerlink" title="设置图片没有背景"></a>设置图片没有背景</h3><pre><code>android:background=&quot;@null&quot;
+</code></pre><h3 id="把RadioButton左边的小圆圈按钮去掉"><a href="#把RadioButton左边的小圆圈按钮去掉" class="headerlink" title="把RadioButton左边的小圆圈按钮去掉"></a>把RadioButton左边的小圆圈按钮去掉</h3><pre><code>android:button=&quot;@null&quot;
+</code></pre><h3 id="ListView无选择效果"><a href="#ListView无选择效果" class="headerlink" title="ListView无选择效果"></a>ListView无选择效果</h3><pre><code>android:listSelector=&quot;@null&quot;
+</code></pre><h3 id="联系人URI"><a href="#联系人URI" class="headerlink" title="联系人URI"></a>联系人URI</h3><ul>
+<li>ContactsContract.Contacts.CONTENT_URI:管理联系人的URI</li>
+<li>ContactsContract.CommonDataKinds.Phone.CONTENT_URI:管理联系人电话的URI</li>
+<li>ContactsContract.CommonDataKinds.Email.CONTENT_URI:管理联系人email的URI</li>
+<li>String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))//获取联系人ID</li>
+<li>String name = cursor.getString(cursor.getColumn(ContactsContract.Contacts.DISPLAY_NAME))//获取联系人姓名</li>
+</ul>
+<h3 id="打电话"><a href="#打电话" class="headerlink" title="打电话"></a>打电话</h3><pre><code>Intent intent = new Intent();
+//设置动作，打电话
+intent.setAction(Intent.ACTION_CALL);
+intent.setData(Uri.parse(&quot;tel:&quot; + phone));
+//把意图告诉系统
+startActivity(intent);
+//设置权限
+&lt;uses-permission android:name= &quot;android.permission.CALL_PHONE&quot;/&gt;
+</code></pre><h3 id="分享文本"><a href="#分享文本" class="headerlink" title="分享文本"></a>分享文本</h3><pre><code>Intent intent = new Intent();
+intent.setAction(Intent.ACTION_SEND);
+intent.setType(&quot;text/plain&quot;);//image/jpeg
+intent.putExtra(Intent.EXTRA_TEXT, &quot;么么哒!&quot;);
+startActivity(intent);
+</code></pre><blockquote>
+<p>在当前分享文本activity中配置 <code>&lt;action android:name=&quot;android.intent.action.SEND&quot; /&gt;&lt;data android:mimeType=&quot;text/plain&quot; /&gt;</code></p>
+</blockquote>
+<h3 id="为ViewPager设置监听-用addOn…"><a href="#为ViewPager设置监听-用addOn…" class="headerlink" title="为ViewPager设置监听,用addOn…."></a>为ViewPager设置监听,用addOn….</h3><pre><code>viewPager.addOnPageChangeListener(new OnPageChangeListener() {
+        @Override
+        public void onPageSelected(int position) {
+            System.out.println(&quot;当前条目&quot;+position);
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            // TODO Auto-generated method stub        
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            // TODO Auto-generated method stub
+        }
+    });
+</code></pre><h3 id="状态选择器-比如ViewPager-时屏幕下方的小圆点的状态-selector-dots"><a href="#状态选择器-比如ViewPager-时屏幕下方的小圆点的状态-selector-dots" class="headerlink" title="状态选择器(比如ViewPager 时屏幕下方的小圆点的状态) selector_dots"></a>状态选择器(比如ViewPager 时屏幕下方的小圆点的状态) selector_dots</h3><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;selector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; &gt;
+    &lt;!-- 如果状态可用(在当前页)，则为白色 --&gt;
+    &lt;item android:state_enabled=&quot;true&quot;  android:drawable=&quot;@drawable/dot_focus&quot;/&gt;
+    &lt;item android:drawable=&quot;@drawable/dot_unfocus&quot;/&gt;
+&lt;/selector&gt;
+</code></pre><p>dot_focus.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:shape=&quot;oval&quot; &gt;
+    &lt;solid android:color=&quot;#ffffff&quot;/&gt;
+&lt;/shape&gt;    
+</code></pre><p>dot_unfocus.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:shape=&quot;oval&quot; &gt;
+    &lt;solid android:color=&quot;#aa000000&quot;/&gt;
+&lt;/shape&gt;
+</code></pre><h3 id="在代码中绘制小圆点"><a href="#在代码中绘制小圆点" class="headerlink" title="在代码中绘制小圆点"></a>在代码中绘制小圆点</h3><pre><code>private void initDots() {
+    for (int i = 0; i &lt; mContent.size(); i++) {
+        View view = new View(this);// 用于显示小圆点
+        LayoutParams params = new LayoutParams(10, 10);// 小圆点的大小
+        view.setLayoutParams(params);
+        if (i != 0) {
+            params.leftMargin = 7;// 设置每个圆点的间隔
+        }
+        view.setBackgroundResource(R.drawable.selector_dot);
+        dots.addView(view);// 把小圆点添加到先行布局里去
+    }
+}
+</code></pre><h3 id="更新小圆点位置"><a href="#更新小圆点位置" class="headerlink" title="更新小圆点位置"></a>更新小圆点位置</h3><pre><code>private void updateDots() {
+    int currentItem = viewPager.getCurrentItem() % mContent.size();
+    for (int i = 0; i &lt; dots.getChildCount(); i++) {
+        dots.getChildAt(i).setEnabled(i == currentItem);
+    }
+}
+</code></pre><h3 id="Android如何设置定时每十分钟执行一次任务"><a href="#Android如何设置定时每十分钟执行一次任务" class="headerlink" title="Android如何设置定时每十分钟执行一次任务"></a>Android如何设置定时每十分钟执行一次任务</h3><pre><code>private Handler handler  = new Handler(){
+    public void handleMessage(Message msg) {
+        super.handleMessage(msg);
+        if(msg.waht == 1){
+            //todo something....
+        }
+    }
+};
+new Timer(true).schedule(new TimerTask() {
+        @Override
+        public void run() {
+            Message msg = Message.obtain();
+              msg.what = 1;
+              handler.sendMessage(msg);
+        }
+    }, 200, 1000);
+</code></pre><h3 id="ListView在代码中动态设置背景、滚动条"><a href="#ListView在代码中动态设置背景、滚动条" class="headerlink" title="ListView在代码中动态设置背景、滚动条"></a>ListView在代码中动态设置背景、滚动条</h3><pre><code>listView.setBackgroundResource(R.drawable.btn_default_transparent_normal);//设置背景
+listView.setVerticalScrollBarEnabled(false);//设置滚动条是否可见
+android:scrollbars=&quot;none&quot; //ListView在XML中设置滚动条不可见
+</code></pre><h3 id="editText限制输入内容的4种方法"><a href="#editText限制输入内容的4种方法" class="headerlink" title="editText限制输入内容的4种方法"></a>editText限制输入内容的4种方法</h3><pre><code>&lt;!-- 方法1 xml中配置inputType。 --&gt;
+&lt;EditText
+    android:id=&quot;@+id/et1&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;wrap_content&quot;
+    android:hint=&quot;只限数字（xml中 配置inputType）&quot;
+    android:inputType=&quot;number&quot; /&gt;
+
+&lt;!-- 方法2 xml中配置digits --&gt;
+&lt;EditText
+    android:id=&quot;@+id/et2&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;wrap_content&quot;
+    android:digits=&quot; .@~-,:*?!#/\\=+?^;%$()[]{}|`&lt;&gt;&amp;&quot;&apos;_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ&quot;
+    android:hint=&quot;只限自定义特殊字符（xml中  配置digits）&quot; /&gt;
+
+//方式3：java中使用setKeyListener，添加DigitsKeyListener。
+//private final static String ET3_DIGITS = &quot;abcd&quot;;
+//et3.setKeyListener(DigitsKeyListener.getInstance(ET3_DIGITS));
+&lt;EditText
+    android:id=&quot;@+id/et3&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;wrap_content&quot;
+    android:hint=&quot;只限abcd（java中使用addTextChangedListener）&quot; /&gt;
+
+//方法4：java中使用setFilters，添加InputFilter。
+&lt;EditText
+    android:id=&quot;@+id/et4&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;wrap_content&quot;
+    android:hint=&quot;只限wxyz（java中使用setFilters）&quot; /&gt;
+
+private final static String ET4_DIGITS = &quot;wxyz&quot;;
+et4.setFilters(new InputFilter[] {new InputFilter() {
+    /**source：你即将输入的字符序列
+     * start：默认为0，  end：你即将输入的字符序列的长度
+     * dest：当前EditText显示的内容
+     * 经测试dstart和dend 总是相等，都表示输入前光标所在位置
+     */
+    @Override
+    public CharSequence filter(CharSequence source, int start, int end,
+            Spanned dest, int dstart, int dend) {            
+
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i &lt; source.length(); i++) {
+            if (ET4_DIGITS.indexOf(source.charAt(i)) &gt;= 0) {
+                sb.append(source.charAt(i));
+            }
+        }
+        return sb;
+    }
+}});
+</code></pre><h3 id="使用代码锁定横竖屏"><a href="#使用代码锁定横竖屏" class="headerlink" title="使用代码锁定横竖屏"></a>使用代码锁定横竖屏</h3><pre><code>setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+</code></pre><h3 id="横竖屏切换时不调用各个生命周期"><a href="#横竖屏切换时不调用各个生命周期" class="headerlink" title="横竖屏切换时不调用各个生命周期"></a>横竖屏切换时不调用各个生命周期</h3><pre><code>android:configChanges=&quot;orientation|keyboardHidden|ScreenSize&quot;
+</code></pre><h3 id="或是在AndroidManifest-xml中配置"><a href="#或是在AndroidManifest-xml中配置" class="headerlink" title="或是在AndroidManifest.xml中配置"></a>或是在AndroidManifest.xml中配置</h3><pre><code>android:screenOrientation=&quot;landscape&quot;是限制此页面横屏显示，
+android:screenOrientation=&quot;portrait&quot;是限制此页面数竖屏显示。 
+</code></pre><h3 id="Activity的View界面全屏"><a href="#Activity的View界面全屏" class="headerlink" title="Activity的View界面全屏"></a>Activity的View界面全屏</h3><pre><code>&lt;!--隐藏标题栏--&gt;
+requestWindowFeature(Window.FEATURE_NO_TITLE); 
+&lt;!--隐藏信号栏--&gt; 
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+</code></pre><h3 id="用程序生成的秘钥得到API"><a href="#用程序生成的秘钥得到API" class="headerlink" title="用程序生成的秘钥得到API"></a>用程序生成的秘钥得到API</h3><p><img src="http://upload-images.jianshu.io/upload_images/3079953-7e4e6dcc015efb44.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/600" alt="用程序生成的秘钥得到API"></p>
+<h3 id="全局去掉标题栏"><a href="#全局去掉标题栏" class="headerlink" title="全局去掉标题栏"></a>全局去掉标题栏</h3><pre><code>&lt;style name=&quot;AppTheme&quot; parent=&quot;AppBaseTheme&quot;&gt;
+   &lt;item name=&quot;android:windowNoTitle&quot;&gt;true&lt;/item&gt;
+&lt;/style&gt;
+</code></pre><h3 id="EditText属性操作"><a href="#EditText属性操作" class="headerlink" title="EditText属性操作"></a>EditText属性操作</h3><pre><code>et.requestFocus(); //请求获取焦点
+et.clearFocus(); //清除焦点
+et.setSelectAllOnFocus(true);//获得焦点时全选文本
+et.setCursorVisible(false);//设置光标不显示
+et.setSelection(int index);//设置光标到指定位置，当内容过多时，可通过该设置让内容显示在屏幕上
+</code></pre><h3 id="EditText设置焦点监听"><a href="#EditText设置焦点监听" class="headerlink" title="EditText设置焦点监听"></a>EditText设置焦点监听</h3><pre><code>editText.setOnFocusChangeListener(new OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if (hasFocus) {
+                //得到焦点
+            }else {
+                //失去焦点
+            }
+        }
+    });
+</code></pre><h3 id="EditText对文本的监听"><a href="#EditText对文本的监听" class="headerlink" title="EditText对文本的监听"></a>EditText对文本的监听</h3><pre><code>editText.addTextChangedListener(new TextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    });
+</code></pre><h3 id="对android软键盘的操作"><a href="#对android软键盘的操作" class="headerlink" title="对android软键盘的操作"></a>对android软键盘的操作</h3><p>在XML布局中设置不同android:imeOptions时软键盘回车键显示的不同效果</p>
+<pre><code>android:imeOptions=”actionDone”    软键盘右下角显示”完成
+android:imeOptions=”actionGo”        软键盘右下角显示”前往
+android:imeOptions=”actionNext”    软键盘右下角显示”下一项
+android:imeOptions=”actionPrevious”    软键盘右下角显示&quot;上一项&quot;
+android:imeOptions=”actionSearch”        软键盘右下角显示&quot;搜索&quot;
+android:imeOptions=&quot;actionSend&quot;        软键盘右下角显示&quot;发送&quot;
+</code></pre><blockquote>
+<p>要给EditText设置inputType或singleLine属性</p>
+</blockquote>
+<p>对软键盘设置监听</p>
+<pre><code>editText.setOnEditorActionListener(new OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            //获得一个输入法管理器对象
+            inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            switch (actionId) {
+            case EditorInfo.IME_ACTION_SEARCH:
+                //隐藏软键盘
+                inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                //执行其它操作
+                break;
+            case EditorInfo.IME_ACTION_NEXT:
+                //隐藏软键盘
+                inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                //执行其它操作
+                break;
+            ........
+
+            default:
+                break;
+            }
+            return true;
+        }
+    });
+</code></pre><h3 id="SimpleAdapter-用法"><a href="#SimpleAdapter-用法" class="headerlink" title="SimpleAdapter 用法"></a>SimpleAdapter 用法</h3><pre><code>public class MainActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ListView listView = (ListView) findViewById(R.id.listView1);
+        //第四个参数内容要和Map的键名一致
+        SimpleAdapter adapter = new SimpleAdapter(this, getData(), R.layout.listview_item, new String[]{&quot;photo&quot;,&quot;name&quot;}, new int[]{R.id.iv_photo,R.id.tv_name});
+        listView.setAdapter(adapter);
+    }
+
+    private List&lt;Map&lt;String, Object&gt;&gt; getData() {
+        List&lt;Map&lt;String, Object&gt;&gt; data = new ArrayList&lt;Map&lt;String, Object&gt;&gt;();
+
+        Map&lt;String, Object&gt; map1 = new HashMap&lt;String, Object&gt;();
+        map1.put(&quot;photo&quot;, R.drawable.img1);
+        map1.put(&quot;name&quot;, &quot;林洪川&quot;);
+        data.add(map1);
+
+        Map&lt;String, Object&gt; map2 = new HashMap&lt;String, Object&gt;();
+        map2.put(&quot;photo&quot;, R.drawable.img2);
+        map2.put(&quot;name&quot;, &quot;刘和广&quot;);
+        data.add(map2);
+        .........
+
+        return data;
+    }
+}
+</code></pre><h3 id="点击Button弹出对话框"><a href="#点击Button弹出对话框" class="headerlink" title="点击Button弹出对话框"></a>点击Button弹出对话框</h3><pre><code>public void btnClick(View view){
+    AlertDialog.Builder builder = new Builder(this);
+    builder.setIcon(...);
+    builder.setTitle(...);
+    buildr.setMessage(...);
+    builder.setPositiveButton..
+    builder.setNegativeButton..
+    AlertDialog dialog = builder.create();//使用创建器，生成一个对话框对象
+    dialog.show();
+    //如下两句可以修改确定取消按钮的颜色，必须写dialog.show()后面
+    dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
+    dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(Color.BLUE);
+}
+</code></pre><h3 id="从系统图库中选择图片并压缩大小显示在ImageView中"><a href="#从系统图库中选择图片并压缩大小显示在ImageView中" class="headerlink" title="从系统图库中选择图片并压缩大小显示在ImageView中"></a>从系统图库中选择图片并压缩大小显示在ImageView中</h3><pre><code>// 得到图片的内容uri
+Uri uri = data.getData();
+// 图库中图片的数据参数
+String[] picPathColumn = { MediaStore.Images.Media.DATA };
+Cursor cursor = getContentResolver().query(uri, picPathColumn, null, null, null);
+cursor.moveToFirst();
+int columnIndex = cursor.getColumnIndex(picPathColumn[0]);
+picturePath = cursor.getString(columnIndex);
+// 把图片路径显示到TextView中
+tvPhotoPath.setText(picturePath);
+ivPhoto.setImageBitmap(compressImg());
+
+public Bitmap compressImg(){
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inJustDecodeBounds = true;//只加载图片大小
+    BitmapFactory.decodeFile(picturePath, options);
+    //缩放图片  18行
+    double ratio = Math.max(options.outWidth*1.0d/1024f,options.outHeight*1.0d/1024f);
+    options.inSampleSize = (int) Math.ceil(ratio);
+    options.inJustDecodeBounds = false;//加载图片
+    Bitmap bitmap = BitmapFactory.decodeFile(picturePath,options);
+    return bitmap;
+}
+//计算缩放比例(可替换18行)
+Display display = getWindowManager().getDefaultDisplay();
+DisplayMetrics displayMetrics = new DisplayMetrics();
+display.getMetrics(displayMetrics);
+//屏幕宽高
+int screenWidth = displayMetrics.widthPixels;
+int screenHeight = displayMetrics.heightPixels;
+//图片宽高
+int imageWidth = options.outWidth;
+int imageHeight = options.outHeight;
+int widthScale = imageWidth/screenWidth;
+int heightScale = imageHeight/screenHeight;
+int scale = widthScale &gt; heightScale? widthScale:heightScale;
+</code></pre><h3 id="drawable-转-bitmap"><a href="#drawable-转-bitmap" class="headerlink" title="drawable 转 bitmap"></a>drawable 转 bitmap</h3><pre><code>public static Bitmap drawable2bitmap(Drawable drawable) {
+    //如果本身就是一个包装了bitmap的drawable对象，直接从现有的Drawable中取出Bitmap:
+    if (drawable instanceof BitmapDrawable) {
+        return ((BitmapDrawable) drawable).getBitmap();
+    }
+    Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+    //注意，下面三行代码要用到，否在在View或者surfaceview里的canvas.drawBitmap会看不到图
+    Canvas canvas = new Canvas(bitmap);
+    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+    drawable.draw(canvas);
+    return bitmap;
+}
+</code></pre><h3 id="bitmap-转-drawable"><a href="#bitmap-转-drawable" class="headerlink" title="bitmap 转 drawable"></a>bitmap 转 drawable</h3><pre><code>public static Drawable bitmap2drawable(Context context, Bitmap bitmap){
+    return new BitmapDrawable(context.getResources(),bitmap);
+}
+</code></pre><h3 id="给-LinearLayout-加分割线（一起使用才有效果）"><a href="#给-LinearLayout-加分割线（一起使用才有效果）" class="headerlink" title="给 LinearLayout 加分割线（一起使用才有效果）"></a>给 LinearLayout 加分割线（一起使用才有效果）</h3><pre><code>android:divider=&quot;@drawable/divider&quot;
+android:showDividers=&quot;middle&quot;
+</code></pre><h3 id="Notification-基本使用-普通服务"><a href="#Notification-基本使用-普通服务" class="headerlink" title="Notification 基本使用(普通服务)"></a>Notification 基本使用(普通服务)</h3><pre><code>//点击通知进入通知详情页
+Intent intent = new Intent(this,NotificationActivity.class);
+PendingIntent pi = PendingIntent.getActivity(this,0,intent,0);
+//使用support-v4包中NotificationCompat类在所有Android系统正常工作
+Notification notification = new NotificationCompat.Builder(this)
+        .setContentTitle(&quot;2016年12月24日星期五&quot;)
+        .setContentText(&quot;今天天气阴天，会下雨,么么哒&quot;)
+        .setWhen(System.currentTimeMillis())
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setContentIntent(pi)
+        .setAutoCancel(true)//进入详情页后把状态栏的通知图标取消
+        .build();
+//获取通知服务
+NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+manager.notify(1, notification);
+//manager.cancel(1);//这里取消也可以
+</code></pre><h3 id="Notification基本使用-前台服务"><a href="#Notification基本使用-前台服务" class="headerlink" title="Notification基本使用(前台服务)"></a>Notification基本使用(前台服务)</h3><pre><code>PendingIntent pi = PendingIntent.getActivity(this,0,intent,0);
+Notification notification = new NotificationCompat.Builder(this)
+        .setContentTitle(&quot;this is content title&quot;)
+        .setContentText(&quot;this is content text&quot;)
+        .setWhen(System.currentTimeMillis())
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher))
+        .setContentIntent(pi)
+        .build();
+startForeground(1,notification);//这个方法会让MyService变成一个前台服务
+</code></pre><blockquote>
+<p>前台服务和普通服务的最大区别就在于它会一直有一个正在运行的图标在系统的状态栏显示(普通服务会在点击通知进入详情页后消失)</p>
+</blockquote>
+<h3 id="判断Wifi是否开启"><a href="#判断Wifi是否开启" class="headerlink" title="判断Wifi是否开启"></a>判断Wifi是否开启</h3><pre><code>WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+boolean enabled = wm.isWifiEnabled();
+</code></pre><h3 id="获取系统最大音量"><a href="#获取系统最大音量" class="headerlink" title="获取系统最大音量"></a>获取系统最大音量</h3><pre><code>AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+int max = am.getStreamMaxVolume(AudioManager.STREAM_SYSTEM);
+</code></pre><h3 id="获取当前音量"><a href="#获取当前音量" class="headerlink" title="获取当前音量"></a>获取当前音量</h3><pre><code>AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+int current = am.getStreamMaxVolume(AudioManager.STREAM_RING);
+</code></pre><h3 id="判断网络是否有连接"><a href="#判断网络是否有连接" class="headerlink" title="判断网络是否有连接"></a>判断网络是否有连接</h3><pre><code>ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+NetworkInfo info = cm.getActiveNetworkInfo();
+boolean isAvailable = info.isAvailable();
+</code></pre><h3 id="TabLayout使用-ViewPager-Fragment-FragmentPagerAdapter"><a href="#TabLayout使用-ViewPager-Fragment-FragmentPagerAdapter" class="headerlink" title="TabLayout使用(ViewPager+Fragment+FragmentPagerAdapter)"></a>TabLayout使用(ViewPager+Fragment+FragmentPagerAdapter)</h3><ul>
+<li><p>创建Fragment</p>
+<pre><code>public static final String ARGS_PAGE = &quot;args_page&quot;;
+private int mPage;
+public static PageFragment newInstance(int page) {
+    Bundle args = new Bundle();
+    args.putInt(ARGS_PAGE, page);
+    PageFragment fragment = new PageFragment();
+    fragment.setArguments(args);
+    return fragment;
+}
+@Override
+public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    mPage = getArguments().getInt(ARGS_PAGE);
+}
+@Nullable
+@Override
+public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    View view = inflater.inflate(R.layout.fragment_page,container,false);
+    TextView textView = (TextView) view.findViewById(R.id.textView);
+    textView.setText(&quot;第&quot;+mPage+&quot;页&quot;);
+    return view;
+}
+</code></pre></li>
+<li><p>适配器类</p>
+<pre><code>class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+    public final int COUNT = 5;
+    private String[] titles = new String[]{&quot;Tab1&quot;, &quot;Tab2&quot;, &quot;Tab3&quot;, &quot;Tab4&quot;, &quot;Tab5&quot;};
+    private Context context;
+    public MyFragmentPagerAdapter(FragmentManager fm, Context context) {
+        super(fm);
+        this.context = context;
+    }
+    @Override
+    public Fragment getItem(int position) {
+        return PageFragment.newInstance(position + 1);
+    }
+    @Override
+    public int getCount() {
+        return COUNT;
+    }
+    @Override
+    public CharSequence getPageTitle(int position) {
+         //給tab加上图片
+        /*Drawable image = mContext.getResources().getDrawable(imageId[position]);
+        image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
+        SpannableString spannableString = new SpannableString(&quot;  &quot; + tabTitles[position]);
+        ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BASELINE);
+        spannableString.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spannableString;*/
+
+        return titles[position];
+    }
+}
+</code></pre></li>
+<li><p>TabLayout的使用</p>
+<pre><code>MyPagerAdapter mAdapter = new MyPagerAdapter(getSupportFragmentManager(),this);
+mViewPager.setAdapter(mAdapter);
+mTabs.setupWithViewPager(mViewPager);
+mTabs.setSelectedTabIndicatorColor(Color.CYAN);//设置指示器颜色
+mTabs.setTabTextColors(Color.BLACK,Color.WHITE);//设置选中颜色
+//tab标签太少，没有占满屏幕宽度，作如下设置
+mTabs.setTabMode(TabLayout.MODE_FIXED);//也可在布局app:tabGravity=&quot;fill &quot;app:tabMode=&quot;fixed&quot;
+mTabs.setTabGravity(TabLayout.GRAVITY_FILL);
+</code></pre></li>
+</ul>
+<h3 id="生成-JSON-对象和数组"><a href="#生成-JSON-对象和数组" class="headerlink" title="生成 JSON 对象和数组"></a>生成 JSON 对象和数组</h3><ul>
+<li><p>创建一个 map，通过构造方法将 map 转换成 json 对象</p>
+<pre><code>Map&lt;String, Object&gt;map =new HashMap&lt;String, Object&gt;();
+map.put(&quot;name&quot;, &quot;zhangsan &quot;);
+map.put(&quot;age&quot;, 24);
+JSONObject json =new JSONObject(map);
+</code></pre></li>
+<li><p>创建一个 json 对象，通过 put 方法添加数据 </p>
+<pre><code>JSONObject json=new JSONObject();
+json.put(&quot;name&quot;, &quot;zhangsan &quot;); 
+json.put(&quot;age&quot;, 24);
+</code></pre></li>
+<li><p>生成 JSON 数组:创建一个 list，通过构造方法将 list 转换成 json 对象 </p>
+<pre><code>Map&lt;String, Object&gt;map1 =new HashMap&lt;String, Object&gt;();
+map1.put(&quot;name&quot;, &quot;zhangsan &quot;);
+map1.put(&quot;age&quot;, 24);
+Map&lt;String, Object&gt;map2 =new HashMap&lt;String, Object&gt;();
+map2.put(&quot;name&quot;, &quot;lisi&quot;);
+map2.put(&quot;age&quot;, 25);
+List&lt;Map&lt;String, Object&gt;&gt;list=new ArrayList&lt;Map&lt;String,Object&gt;&gt;();
+list.add(map1);
+list.add(map2);
+JSONArray array=new JSONArray(list);
+</code></pre></li>
+</ul>
+<h3 id="Android6-0权限申请"><a href="#Android6-0权限申请" class="headerlink" title="Android6.0权限申请"></a>Android6.0权限申请</h3><pre><code>`if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+    }
+.....
+
+@Override
+public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    switch (requestCode) {
+        case 1:
+            if (grantResults.length &gt; 0 &amp;&amp; grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, &quot;拒绝权限将无法使用程序&quot;, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            break;
+        default:
+            break;
+    }
+}`
+</code></pre><p>待续。。。</p>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="298" height="52" src="//music.163.com/outchain/player?type=2&id=26127161&auto=1&height=32"></iframe>
+          <br>
+<p>hogen</p>
+<div class='date'>2017-05-10</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

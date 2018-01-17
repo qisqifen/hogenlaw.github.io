@@ -1,0 +1,174 @@
+<html>
+  <head>
+    <title>AndroidStudio 创建 Hybrid App工程 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/04/30/native-learning2/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/04/24/foreach-in-AndroidStudio/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-04-30</div> --><!--正文的日期-->
+            AndroidStudio 创建 Hybrid App工程
+          </h1>
+          <p> 国内外Hybrid App的开发框架众多，PhoneGap(cordova )、AppCan、APICloud、WeX5 还有 Neact Native 等等好多，我当时接触的是<a href="http://dcloud.io/" target="_blank" rel="noopener"> DCloud 公司的 MUI</a> 框架，所以这篇文章采用的是用其 5+SDK 创建 Hybrid App工程</p>
+<p> 后续文章将讲到使用 Native.js 实现 Android 原生代码和 HTML 的数据交互，看本篇文章前建议先看如下文章：</p>
+<p> <a href="http://ask.dcloud.net.cn/article/526?notification_id-76397__item_id-3005" target="_blank" rel="noopener">Android独立应用方式集成HTML5+SDK,Widget方式离线打包,空项目讲解 </a></p>
+<h3 id="工具准备"><a href="#工具准备" class="headerlink" title="工具准备"></a>工具准备</h3><p><a href="http://download.dcloud.net.cn/HBuilder.8.1.2.windows.zip" target="_blank" rel="noopener">HBuilder</a>、 <a href="https://developer.android.google.cn/studio/index.html" target="_blank" rel="noopener">AndroidStudio</a>、<a href="http://download.dcloud.net.cn/Android-SDK@1.9.9.30983_20170414.zip" target="_blank" rel="noopener">5+SDK</a></p>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ul>
+<li><p>首先去DCloud官网下载5+SDK,下载后解压目录如下，解压的文件夹名称 Android-SDK</p>
+<p>  <img src="/2017/04/30/Native-learning1/5+sdk.png" alt="5+sdk"></p>
+</li>
+<li><p>用 AndroidStudio 创建一个空的 Android 工程，一路NEXT直到finish(这图就不贴了吧)</p>
+</li>
+<li><p>把Android-SDK目录下 HBuilder-Hello 这个项目导入到 AndroidStudio，导入后如下</p>
+<p>  <img src="/2017/04/30/Native-learning1/hbuilder-hello.png" alt="lib"></p>
+<blockquote>
+<p>有错不用管，导入 AndroidStudio 只是更好的和自己新建的项目对比目录</p>
+</blockquote>
+</li>
+<li><p>接着把上图的 libs 和 src 文件拷贝到自己工程下的相应位置(覆盖掉自己生成的)</p>
+<p>  <img src="/2017/04/30/Native-learning1/copy.png" alt="copy"></p>
+</li>
+<li><p>运行程序，如下表示成功了</p>
+<p>  <img src="/2017/04/30/Native-learning1/success.png" alt="success"></p>
+</li>
+</ul>
+<h3 id="项目精简"><a href="#项目精简" class="headerlink" title="项目精简"></a>项目精简</h3><p> 因为本系列文章是讲 Native.js，其它的功能我们暂时不用，所以是可以删掉的，比如我的项目把删减如下</p>
+<p><img src="/2017/04/30/Native-learning1/jian1.png" alt="jian1"></p>
+<p><img src="/2017/04/30/Native-learning1/jian2.png" alt="jian2"></p>
+<p>AndroidManifest.xml文件删减如下</p>
+<pre><code>&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    package=&quot;io.dcloud.HBuilder.Hello&quot;
+    android:versionCode=&quot;570&quot;
+    android:versionName=&quot;5.7.0&quot;&gt;
+    &lt;supports-screens
+        android:anyDensity=&quot;true&quot;
+        android:largeScreens=&quot;true&quot;
+        android:normalScreens=&quot;true&quot;
+        android:resizeable=&quot;true&quot;
+        android:smallScreens=&quot;true&quot; /&gt;
+    &lt;uses-sdk android:minSdkVersion=&quot;8&quot; /&gt;
+    &lt;!-- HBuilder Runtime 基础权限   begin --&gt;
+    &lt;!-- 联网 --&gt;
+    &lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;
+    &lt;!-- 使用存储卡 --&gt;
+    &lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; /&gt;
+    &lt;uses-permission android:name=&quot;android.permission.ACCESS_NETWORK_STATE&quot; /&gt;
+    &lt;uses-permission android:name=&quot;android.permission.GET_TASKS&quot; /&gt;
+    &lt;!-- Html5Plus runtime基础权限   end --&gt;
+    &lt;application
+        android:name=&quot;io.dcloud.application.DCloudApplication&quot;
+        android:allowClearUserData=&quot;true&quot;
+        android:icon=&quot;@drawable/icon&quot;
+        android:label=&quot;@string/app_name&quot;
+        android:largeHeap=&quot;true&quot;&gt;
+        &lt;activity
+            android:name=&quot;io.dcloud.PandoraEntry&quot;
+            android:configChanges=&quot;orientation|keyboardHidden|keyboard|navigation&quot;
+            android:hardwareAccelerated=&quot;true&quot;
+            android:label=&quot;@string/app_name&quot;
+            android:launchMode=&quot;singleTask&quot;
+            android:screenOrientation=&quot;user&quot;
+            android:theme=&quot;@style/TranslucentTheme&quot;
+            android:windowSoftInputMode=&quot;adjustResize&quot;&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+
+                &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/activity&gt;
+        &lt;activity
+            android:name=&quot;io.dcloud.PandoraEntryActivity&quot;
+            android:configChanges=&quot;orientation|keyboardHidden|screenSize|keyboard|navigation|mcc|mnc|fontScale&quot;
+            android:hardwareAccelerated=&quot;true&quot;
+            android:label=&quot;5+Debug&quot;
+            android:launchMode=&quot;singleTask&quot;
+            android:screenOrientation=&quot;user&quot;
+            android:theme=&quot;@style/DCloudTheme&quot;
+            android:windowSoftInputMode=&quot;adjustResize&quot;&gt;
+        &lt;/activity&gt;
+        &lt;service
+            android:name=&quot;io.dcloud.common.adapter.io.MiniServerService&quot;
+            android:exported=&quot;true&quot; /&gt;
+    &lt;/application&gt;
+
+&lt;/manifest&gt;
+</code></pre><p>当然你可以继续阅读官方文档仔细删减，最后效果如下：</p>
+<p><img src="/2017/04/30/Native-learning1/last.png" alt="last"></p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-04-30</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

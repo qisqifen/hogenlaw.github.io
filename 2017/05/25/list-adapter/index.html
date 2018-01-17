@@ -1,0 +1,315 @@
+<html>
+  <head>
+    <title>ListView 通用 Adapter 封装 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/05/25/utils/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/05/10/Android-develop-summary/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-05-25</div> --><!--正文的日期-->
+            ListView 通用 Adapter 封装
+          </h1>
+          <p>鸿神出品，必属精品，这个就 NB 了，<a href="http://blog.csdn.net/lmj623565791/article/details/38902805" target="_blank" rel="noopener">地址在这里</a>，自从看了这个后，我后面的 Android 项目几乎都是采用这样的模式，妈妈再也不用担心我重复的写 ListView 的 Adapter了，另外加上了点击事件</p>
+<p> CommonAdapter 传入一个泛型 T 以供装载不同的 Bean 对象，同时暴露一个 convert 方法，并且还把 viewHolder 和本 Item对于的 Bean 对象给传出去，外部类实现 convert 方法后，通过 ViewHolder 把View 找到，通过 Item 设置值，这里传入一个 postion 是为了方便做事件监听</p>
+<pre><code>public abstract class CommonAdapter&lt;T&gt; extends BaseAdapter {
+    private List&lt;T&gt; mData;
+    private Context mContext;
+    protected final int mLayoutId;
+
+    public CommonAdapter(Context mContext, List&lt;T&gt; mData, int mLayoutId) {
+        this.mData = mData;
+        this.mContext = mContext;
+        this.mLayoutId = mLayoutId;
+    }
+    @Override
+    public int getCount() {
+        return mData.size()!=0?mData.size():0;
+    }
+
+    @Override
+    public T getItem(int position) {
+        return mData.get(position)!=null?mData.get(position):null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder = ViewHolder.get(mContext, convertView, parent, mLayoutId, position);
+        convert(viewHolder,getItem(position),position);
+
+        return viewHolder.getConvertView();
+    }
+    //对外公布了一个convert方法，并且还把viewHolder和本Item对于的Bean对象给传出去，
+    // 实现convert方法后，里面需要干嘛呢？通过ViewHolder把View找到，通过Item设置值
+    //传入一个postion方便做事件监听
+    public abstract void convert(ViewHolder holder,T item, int position);
+}
+</code></pre><hr>
+<p>ViewHolder 用来实现装载布局，存储 View，并与 convertview 绑定</p>
+<pre><code>public class ViewHolder {
+    //与传统的ViewHolder不同，
+    // 我们使用了一个SparseArray&lt;View&gt;用于存储与之对于的convertView的所有的控件，
+    // 当需要拿这些控件时，通过getView(id)进行获取；
+    private final SparseArray&lt;View&gt; mViews;
+    private View mConvertView;
+    private int mPosition;
+    public ViewHolder(Context context,ViewGroup parent,int layoutId,int position) {
+        this.mViews = new SparseArray&lt;&gt;();
+        this.mConvertView = LayoutInflater.from(context).inflate(layoutId,parent,false);
+        this.mPosition = position;
+        mConvertView.setTag(this);
+    }
+
+    //拿到一个ViewHolder对象
+    public static ViewHolder get(Context context, View convertView,ViewGroup parent, int layoutId, int position) {
+        if (convertView == null) {
+            return new ViewHolder(context,parent,layoutId,position);
+        }
+        return (ViewHolder)convertView.getTag();
+    }
+
+    //通过控件的Id获取对于的控件，如果没有则加入views
+    public &lt;T extends View&gt; T getView(int viewId) {
+        View view = mViews.get(viewId);
+        if (view == null) {
+            view = mConvertView.findViewById(viewId);
+            mViews.put(viewId,view);
+        }
+        return (T) view;
+    }
+
+    public View getConvertView() {
+        return mConvertView;
+    }
+    /**
+     * 为TextView设置字符串
+     * @param viewId
+     * @param text
+     * @return
+     */
+    public ViewHolder setText(int viewId, String text){
+        TextView textView = getView(viewId);
+        textView.setText(text);
+        return this;
+    }
+    /**
+     * 为ImageView设置图片
+     *
+     * @param viewId
+     * @param drawableId
+     * @return
+     */
+    public ViewHolder setImageResource(int viewId, int drawableId){
+        ImageView imageView = getView(viewId);
+        imageView.setImageResource(drawableId);
+        return this;
+    }
+    /**
+     * 为ImageView设置图片
+     * @param viewId
+     * @param bm
+     * @return
+     */
+    public ViewHolder setImageBitmap(int viewId, Bitmap bm){
+        ImageView imageView = getView(viewId);
+        imageView.setImageBitmap(bm);
+        return this;
+    }
+
+    public ViewHolder setImageByUrl(int viewId, String url){
+        //使用url加载图片
+        return this;
+    }
+    //返回一个Postion
+    public int getPosition(){
+        return mPosition;
+    }
+}
+</code></pre><hr>
+<p>再来看看封装 Adpater 后 MainActivity 的写法</p>
+<pre><code>public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = &quot;MainActivity&quot;;
+    private List&lt;String&gt; simpleData = Arrays.asList(&quot;aaa&quot;, &quot;bbb&quot;, &quot;ccc&quot;, &quot;ddd&quot;, &quot;Ffff&quot;,
+            &quot;ggg&quot;, &quot;111&quot;, &quot;222&quot;, &quot;333&quot;, &quot;$44&quot;, &quot;5555&quot;, &quot;666&quot;, &quot;777&quot;, &quot;8888&quot;, &quot;bbb&quot;, &quot;ccc&quot;, &quot;ddd&quot;, &quot;Ffff&quot;);
+
+    private List&lt;BeanItem&gt; mData = Arrays.asList(
+            new BeanItem(&quot;保险&quot;,&quot;支付宝推出大病无忧保，看来马云把触角伸到保险领域了，每线下消费一笔&quot;,&quot;11111111&quot;,android.R.drawable.ic_delete),
+            new BeanItem(&quot;重疾险&quot;,&quot;健康保障金额就会增加，最高上限是2000，这个是免费给你的&quot;,&quot;22222222&quot;,android.R.drawable.ic_delete),
+            new BeanItem(&quot;Kotlin&quot;,&quot;今天打开微信，几乎各个技术公众号都在写 Google IO 2017 的消息&quot;,&quot;33333333&quot;,R.mipmap.ic_launcher),
+            new BeanItem(&quot;XXX&quot;,&quot;XXXXXXXXXXXXXXXX,在食XXXX三楼&quot;,&quot;44444444&quot;,R.mipmap.ic_launcher),
+            new BeanItem(&quot;XXXX&quot;,&quot;周三早XXXX上捡到XXX一只XXX&quot;,&quot;1ASFASDF11&quot;,android.R.drawable.ic_delete)
+    );
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ListView mListView = (ListView) findViewById(R.id.listView);
+        //通用写法
+//        mListView.setAdapter(new MyAdater(this,mData));
+        //封装后写法(简单布局)
+//        mListView.setAdapter(new CommonAdapter&lt;String&gt;(getApplicationContext(), simpleData, R.layout.list_item) {
+//            @Override
+//            public void convert(final ViewHolder holder, String item) {
+//                holder.setText(R.id.textView, item);
+//                //添加点击事件
+//                holder.getView(R.id.textView).setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        int position = holder.getPosition();
+//                        Toast.makeText(MainActivity.this, &quot;点击了第: &quot;+position+&quot;个条目&quot;, Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
+//        });
+        //封装后写法(复杂布局)
+        mListView.setAdapter(new CommonAdapter&lt;BeanItem&gt;(getApplicationContext(),mData,R.layout.list_item) {
+
+            @Override
+            public void convert(ViewHolder holder, BeanItem item, final int position) {
+                holder.setText(R.id.tv_title,item.getTitle());
+                holder.setText(R.id.tv_describe,item.getDesc());
+                holder.setText(R.id.tv_time,item.getTime());
+                holder.setImageResource(R.id.image,item.getImageId());
+                holder.getView(R.id.relativeLayout).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, &quot;点击sf了sf第: &quot;+position+&quot;个条目&quot;, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+}
+</code></pre><p>list_item 布局是这样的</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;wrap_content&quot;
+    android:background=&quot;#ffffff&quot;
+    android:id=&quot;@+id/relativeLayout&quot;
+    android:orientation=&quot;vertical&quot;
+    android:padding=&quot;10dp&quot; &gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/tv_title&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:maxLines=&quot;1&quot;
+        android:text=&quot;星期天&quot;
+        android:textSize=&quot;16sp&quot;
+        android:textColor=&quot;#444444&quot; /&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/tv_describe&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_below=&quot;@id/tv_title&quot;
+        android:layout_marginTop=&quot;10dp&quot;
+        android:maxLines=&quot;2&quot;
+        android:minLines=&quot;1&quot;
+        android:text=&quot;2017年5月21日09:36:27&quot;
+        android:textColor=&quot;#898989&quot;
+        android:textSize=&quot;16sp&quot; /&gt;
+
+    &lt;TextView
+        android:id=&quot;@+id/tv_time&quot;
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_below=&quot;@id/tv_describe&quot;
+        android:layout_marginTop=&quot;10dp&quot;
+        android:text=&quot;20130240122&quot;
+        android:textColor=&quot;#898989&quot;
+        android:textSize=&quot;12sp&quot; /&gt;
+    &lt;ImageView
+        android:layout_width=&quot;wrap_content&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:id=&quot;@+id/image&quot;
+        android:layout_centerInParent=&quot;true&quot;
+        android:layout_alignParentRight=&quot;true&quot;
+        android:src=&quot;@mipmap/ic_launcher&quot;/&gt;
+&lt;/RelativeLayout&gt;
+</code></pre><p>效果和之前写的还是一样的，哈哈！</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3079953-ddbd162865e4890f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/600" alt="运行效果"></p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2017-05-25</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>

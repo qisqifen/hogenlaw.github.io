@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <title>测试问答 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2017/05/06/ireport-learning/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2017/04/30/native-learning2/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2017-05-01</div> --><!--正文的日期-->
+            测试问答
+          </h1>
+          <p>这篇文章是在给东莞银行个贷系统及我司小贷系统做测试时对 QA 人员的系统强化培训总结，测试最主要也是最基本的目的在尽早地发现错误，提高软件产品质量，对于 QA ，作为一名合格的QA，需要对以下问题有基本的认知</p>
+<p><strong>Q1：测试前的准备工作有哪些？</strong></p>
+<ul>
+<li>研读需求规格说明书（如有其他设计文档最好）、使用手册及产品业务知识来了解业务需求及测试的范围。</li>
+<li>走读缺陷跟踪库中的问题报告，产品的历史测试用例。</li>
+<li>学习产品的业务知识。<br>——上述2点还要了解数据如何有效使用（创建有效及无效数据）</li>
+<li>至少会使用一种测试工具，提高测试的效率。</li>
+<li>在开发组的协助下搭建测试环境，测试环境及测试数据需要有备份，有利于循环使用。</li>
+</ul>
+<p><strong>Q2：如何做SIT及UAT？ 有哪些测试技术会使用？</strong></p>
+<p>SIT：系统集成测试，集成测试的范围可客制化，主要是将系统中各个模块合并起来作为一个组测试（全部模块组合在一起时则为系统测试），测试数据在各个模块间的流动中会出现的错误。它是在单元测试结束之后进行的，故可以以单元测试的测试案例作为基础，进行组合或者重新编写。用到的测试技术主要是黑盒测试。</p>
+<p>UAT:用户验收测试，一般是客户端进行的测试，主要是确认软件的功能是否符合客户提出的需求，以需求分析文档为主要参考，一般分为3个阶段：</p>
+<p>1.仿真的环境中，使用旧数据。</p>
+<p>2.真实的环境中使用旧数据。</p>
+<p>3.真实的环境中使用真实的数据。（SIT或UAT使用仿真的环境，一般没有接口环境；UAT使用的数据，无论新旧数据都是客户真实的数据。）用到的测试技术是全黑盒测试。</p>
+<blockquote>
+<p>测试范围及测试数据的有效性涵盖：针对SIT或UAT进行功能性测试时，主要是进行需求覆盖（不是代码覆盖）的方法来涵盖测试功能，以及采用边界值（范围）及等价类的测试技术来有效涵盖测试的数据。</p>
+</blockquote>
+<p><strong>Q3：如何辨识、拟清（澄清）及处理测试过程或测试结果的责任归属？</strong></p>
+<p>UT阶段测试出现了问题是开发人员的责任</p>
+<p>SIT阶段出现了问题是SA和开发人员的责任  </p>
+<p>UAT阶段出现了问题是SA、开发、用户的责任</p>
+<p>用户：需求没讲清楚</p>
+<p>SA：对需求理解有问题，或是设计有问题</p>
+<p>开发人员：可能对高阶设计的理解有问题，做详细设计及编码有问题</p>
+<blockquote>
+<p>所以为了尽可能减少项目后期的问题，开发组要落实做好UT，这一步做好了SIT的问题可容易拟清，减少开发或测试时间；如果开发组有按照开发及测试流程来做好UT&amp;SIT，则比较容易与UAT测出的问题来比对及拟清责任归属，也可以节省开发及测试时间。</p>
+</blockquote>
+<p><strong>Q4：测试案例及测试报告的使用，需要注意哪些重点？</strong>　</p>
+<ol>
+<li>测试环境，测试数据，测试技术和相关材料是否有准备好； </li>
+<li>测试案例是否有遵循某些标准 （例如测试模板、测试质量要求）；</li>
+<li>测试案例是否有包含完整的描述，包括输入数据、测试步骤和预期的结果，是不是都已经定义清楚了；</li>
+<li>测试案例的设计能不能找到bug；</li>
+<li>测试案例能否找到一些不容易找到的地方，测试数据有没有延伸性；</li>
+<li>测试计划是不是能覆盖一些很难找到的问题(测漏)；</li>
+<li>是否提供一个度量可以来衡量测试有没有完成、有没有可信度；</li>
+<li>无效数据和有效数据是否都已经测过了；</li>
+<li>测试案例是否有测试范围及测试功能的说明；测试案例设计后，是否有经过小组长或同事的初步审查及记录。</li>
+<li>测试报告是否有针对测试案例设计的范围、步骤及方法来执行测试，是否有记录测试的过程（测试每一个步骤的贴图及文字说明）及分析测试结果（质量摘要记录及是否有满足客户或最终用户的质量要求。）；测试报告是否有审查者（小组长或同事）的审查意见；测试报告要求的测试结果要达到95%以上通过，且剩余的5%以下部分要有适当的处理及说明，方可提交 。</li>
+</ol>
+<p><strong>Q5：与用户组、运维组、开发组沟通的重点工作有哪些？应注意哪些事情？</strong></p>
+<ol>
+<li>与用户组：尽量拿到最新的需求文档及操作手册，了解系统最新功能；测试要符合用户实际需求与功能需求。</li>
+<li>与运维组：如果是程序问题，要提出证据（测试Log、测试案例及测试报告）来与运维组及开发组确认是否为程序问题，并协调出问题处理的严重级别及优先处理级别；开发组提出的解决方案要取得客户组（此时测试人员属于客户组）、运维组及开发组的认同方可执行，可能会暂时修改数据，后面再一并来修改代码；也有可能会修改设计及代码。运维组如要求尽快解决问题时，需要开发组与用户组的分工配合，才可满足线上用户的要求。 </li>
+<li>与开发组：查看需求文档（来自用户组）或需求分析文档（来自开发组），如有问题要咨询用户组或开发组；开发组如有其他设计文档（例如高阶设计或详细文档），如可设法取得，可节省业务知识细节理解或测试案例设计的时间。</li>
+<li>应该多注意沟通的技巧，肯学习，有耐心，多沟通。</li>
+</ol>
+<p><strong>Q6：要如何加强测试组的测试质量？</strong></p>
+<ol>
+<li>测试尽早介入了解详细的业务需求，做好前期准备，制定测试计划；</li>
+<li>执行测试前要做好测试案例的设计及审查工作；测试报告也需要有小组长的审查（如时间不够，可采取重点检查）。</li>
+<li>测试人员多运用测试方法及测试工具的使用（如自动化测试和性能测试，bug管理工具）或写人工脚本作批量数据导入。</li>
+<li>规范软件配置管理，创建文件服务器来保留测试资产（业务知识、测试有关文档、需求及设计文档、测试数据、测试数据库、测试环境备份）及做好版本控制及备份。</li>
+<li>邀请资深用户、用户组资深测试人员、开发组及运维组来协助进行业务培训，因此QA Leader应有良好的沟通能力（例如委婉及耐心）。</li>
+</ol>
+<p><strong>除了对一般测试者的要求（开发测试人员：开发流程、UT&amp;IT测试能力），QA测试者（还要有SIT &amp; UAT的测试能力）还需要有哪些能力？</strong></p>
+<ul>
+<li>使用一些测试工具（可编写自动化测试程序）或可自行编写测试脚本；</li>
+<li>使用SQL来查询数据库及分析数据的能力；</li>
+<li>分析及逻辑、统筹（观察、识别及理解）及组织能力；</li>
+<li>适应及积极学习、自发主动、独立解决问题的能力；</li>
+<li>沟通（口头及书面表达）及团队合作的能力；</li>
+<li>了解业务知识及业务策略的能力。</li>
+</ul>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="298" height="52" src="//music.163.com/outchain/player?type=2&id=410042763&auto=1&height=32"></iframe>
+          <br>
+<p>hogen</p>
+<div class='date'>2017-05-01</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>
