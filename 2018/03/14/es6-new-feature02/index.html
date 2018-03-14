@@ -1,0 +1,408 @@
+<html>
+  <head>
+    <title>es6 新特性02 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+  
+    <div class='right'>
+      <a href='/2018/01/17/es6-new-feature01/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2018-03-14</div> --><!--正文的日期-->
+            es6 新特性02
+          </h1>
+          <h3 id="this-问题"><a href="#this-问题" class="headerlink" title="this 问题"></a>this 问题</h3><p>普通函数：<strong>根据调用我的人</strong>  this老变</p>
+<ul>
+<li><p>所属环境：在 document.onclick 函数体中</p>
+<pre><code>&lt;script&gt;
+  document.onclick = function(){
+    alert(this);//[object HTMLDocument]
+  };
+&lt;/script&gt;
+</code></pre></li>
+<li><p>所属环境：在 setInterval定时器 函数体中</p>
+<pre><code>&lt;script&gt;
+ setInterval(function(){
+    alert(this);//[object Window]
+  },2000);
+&lt;/script&gt;
+</code></pre><blockquote>
+<p>定时器前省略了 window.setInterval，它属于 window 浏览器</p>
+</blockquote>
+</li>
+<li><p>所属环境：在 数组定义 函数体中</p>
+<pre><code>&lt;script&gt;
+ document.onclick = function(){
+    let arr = [1,2,3,4];
+    arr.a = function(){
+        alert(this);//1,2,3,4
+    };
+    arr.a();
+  };
+&lt;/script&gt;
+</code></pre></li>
+</ul>
+<p>箭头函数：<strong>根据所在的环境</strong>  this恒定</p>
+<ul>
+<li><p>所属环境：在 document.onclick 函数体中，不管谁调用，都是 document</p>
+<pre><code>&lt;script&gt;
+ document.onclick = function(){
+    let arr = [1,2,3,4];
+    arr.a = ()=&gt;{
+        alert(this);//[object HTMLDocument]
+    };
+    arr.a();
+};
+&lt;/script&gt;
+</code></pre></li>
+<li><p>所属环境：在 window 全局域中(定时器之类的都是属于 window)，不管谁调用，都是window</p>
+<pre><code>&lt;script&gt;
+    let arr = [1,2,3,4];
+        arr.a = ()=&gt;{
+            alert(this);
+            console.log(this);//[object Window]
+        }
+        arr.a();
+&lt;/script&gt;
+</code></pre></li>
+</ul>
+<p><strong>bind——给函数定死一个this</strong></p>
+<pre><code>class Person{
+  constructor(name, age){
+    this.name=name;
+    this.age=age;
+    console.log(this);//Person {name: &quot;blue&quot;, age: 18}
+  }
+
+  showName(){
+    alert(this);
+    alert(&apos;我叫&apos;+this.name);
+  }
+  showAge(){
+    alert(&apos;我&apos;+this.age+&apos;岁&apos;);
+  }
+}
+
+let p=new Person(&apos;hogen&apos;, 18);
+p.showAge();//showAge 方法的 this 值为 [object Object]
+//如下做法不靠谱
+document.onclick=p.showName;//showName方法的 this 值为[object HTMLDocument]，弹出 &apos;我叫undefined&apos;
+// ES6 之前的解决方法
+document.onclick = function(){
+    p.showName();
+};
+// ES6 的正确打开姿势，用 bind 来定死 this，防止变来变去
+ document.onclick=p.showName.bind(p);//showName方法的 this 值为[object Object]，弹出 &apos;我叫blue&apos;
+</code></pre><p><strong>bind 是 function 的 bind，跟面向对象无关</strong></p>
+<pre><code>function show(){
+    alert(`this的值是：${this}`);//this的值是：[object HTMLDocument]
+   }
+document.onclick = show;
+
+function show(){
+    alert(`this的值是：${this}`);//this的值是：[object Window]
+   }
+document.onclick = show.bind();
+
+function show(){
+    alert(`this的值是：${this}`);//this的值是：abc
+   }
+document.onclick = show.bind(&apos;abc&apos;);
+</code></pre><h3 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h3><p>传统异步方式+Promise写法</p>
+<pre><code>function ajax(url,fnSucc,fnFailed){
+    //创建ajax对象
+    if (window.XMLHttpRequest) {
+        var oAjax = new XMLHttpRequest();
+    }else{
+        var oAjax = new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;);
+    }
+    //alert(oAjax.readyState);// 0 初始化，刚刚创建
+    //连接服务器
+    oAjax.open(&apos;GET&apos;,url,true);
+    //alert(oAjax.readyState);// 1 已连接 
+
+    //发送请求
+    oAjax.send();
+
+    //接受返回
+    oAjax.onreadystatechange = function(){
+        //alert(oAjax.readyState);// 2(已发送)、3(已接收-头)、4(已接收-body) 
+        if (oAjax.readyState==4) {//读取完成
+            if(oAjax.status&gt;=200 &amp;&amp; oAjax.status&lt;300 || oAjax.status==304){
+                if (fnSucc) {
+                    fnSucc(oAjax.responseText);// 把读取的结果作为参数传给方法
+                }
+            }else{
+                if (fnFailed) {//看看用户有没有传失败的方法过来
+                    fnFailed(oAjax.status);//传给用户，可以清楚是何种原因导致失败
+                }
+            }
+        }
+    }
+}
+
+function createPromise(url) {
+    return new Promise((resolve,reject)=&gt;{
+        ajax(url,function(res){
+            resolve(res);//成功
+        },
+        function(err){
+            reject(err);//拒绝
+        })
+    });
+}
+Promise.all([
+        createPromise(&quot;data/11.txt&quot;),
+        createPromise(&quot;data/2.txt&quot;),
+        createPromise(&quot;data/3.txt&quot;)
+    ]).then(arr=&gt;{//多个 promis 的返回值是一个数组
+        let [data1,data2,data3] = arr;
+        console.log(data1);
+        console.log(data2);
+        console.log(data3);
+        // console.log(results);
+    },err=&gt;{
+        alert(`发送错误了!,错误码是${err}`);
+    });
+</code></pre><p>jquery+Promise写法：jquery3.2 版本后，ajax 默认返回的就是一个Promise 对象</p>
+<pre><code>Promise.all([
+        $.ajax({url:&quot;data/1.txt&quot;,dataType:&quot;json&quot;}),
+        $.ajax({url:&quot;data/2.txt&quot;,dataType:&quot;json&quot;})
+    ]).then(arr=&gt;{//多个 promis 的返回值是一个数组
+        let [data1,data2] = arr;
+        console.log(data1);
+        console.log(data2);
+    },err=&gt;{
+        alert(`至少一个文件读取失败,错误码是：${err.status}`);
+    });
+</code></pre><h3 id="Genarator"><a href="#Genarator" class="headerlink" title="Genarator"></a>Genarator</h3><p>jquery+Genarator：jquery3.2 版本后，ajax 默认返回的就是一个Promise 对象</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;Promise&lt;/title&gt;
+    &lt;!--引入ajax函数--&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;js/ajax.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;js/jquery.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;js/runner.js&quot;&gt;&lt;/script&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        runner(function *(){
+            let data1  = yield $.ajax({url:&apos;data/1.txt&apos;,dataType:&quot;json&quot;});
+            let data2 = yield $.ajax({url:&quot;data/2.txt&quot;,dataType:&quot;json&quot;});
+            let data3 = yield $.ajax({url:&quot;data/3.txt&quot;,dataType:&quot;json&quot;});
+            console.log(data1,data2,data3);
+        });
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><blockquote>
+<p>genarator 和 promise 的区别在于当需要在异步处理复杂逻辑适合用 genarator ,当然 genarator 本身内部是对 promise 的封装，以下为异步处理逻辑传统 ajax、promise、genarator三种写法的不同</p>
+</blockquote>
+<pre><code>//带逻辑-普通回调
+$.ajax({url: &apos;getUserData&apos;, dataType: &apos;json&apos;, success(userData){//读取用户数据
+  if(userData.type==&apos;VIP&apos;){//判断当前用户是否是 VIP 用户
+    $.ajax({url: &apos;getVIPItems&apos;, dataType: &apos;json&apos;, success(items){
+      //生成列表、显示...
+    }, error(err){
+      alert(&apos;错了&apos;);
+    }});
+  }else{
+    $.ajax({url: &apos;getItems&apos;, dataType: &apos;json&apos;, success(items){
+      //生成列表、显示...
+    }, error(err){
+      alert(&apos;错了&apos;);
+    }});
+  }
+}, error(err){
+  alert(&apos;错了&apos;);
+}});
+
+//带逻辑-Promise
+Promise.all([
+  $.ajax({url: &apos;getUserData&apos;, dataType: &apos;json&apos;})
+]).then(results=&gt;{
+  let userData=results[0];
+
+  if(userData.type==&apos;VIP&apos;){
+    Promise.all([
+      $.ajax({url: &apos;getVIPItems&apos;, dataType: &apos;json&apos;})
+    ]).then(results=&gt;{
+      let items=results[0];
+
+      //生成列表、显示...
+    }, err=&gt;{
+      alert(&apos;错了&apos;);
+    });
+  }else{
+    Promise.all([
+      $.ajax({url: &apos;getItems&apos;, dataType: &apos;json&apos;})
+    ]).then(results=&gt;{
+      let items=results[0];
+
+      //生成列表、显示...
+    }, err=&gt;{
+      alert(&apos;错了&apos;);
+    });
+  }
+}, err=&gt;{
+  alert(&apos;失败&apos;);
+});
+
+//带逻辑-generator
+runner(function *(){
+  let userData=yield $.ajax({url: &apos;getUserData&apos;, dataType: &apos;json&apos;});
+
+  if(userData.type==&apos;VIP&apos;){
+    let items=yield $.ajax({url: &apos;getVIPItems&apos;, dataType: &apos;json&apos;});
+  }else{
+    let items=yield $.ajax({url: &apos;getItems&apos;, dataType: &apos;json&apos;});
+  }
+
+  //生成、...
+});
+</code></pre><h3 id="async-和-awit"><a href="#async-和-awit" class="headerlink" title="async 和 awit"></a>async 和 awit</h3><p>用 async 和 awit 读取数据</p>
+<pre><code>async function show(){
+    let data1 = await $.ajax({url:&apos;data/1.txt&apos;,dataType:&apos;json&apos;});
+    let data2 = await $.ajax({url:&apos;data/2.txt&apos;,dataType:&apos;json&apos;});
+    let data3 = await $.ajax({url:&apos;data/3.txt&apos;,dataType:&apos;json&apos;});
+    console.log(data1,data2,data3);
+}
+show();
+</code></pre><blockquote>
+<p>用 async 的好处是不需要依赖外部库(例如上面用到的 runner.js)<br>上述可以变成一个匿名函数</p>
+</blockquote>
+<pre><code>(async function() {
+    let data1 = await $.ajax({url:&apos;data/1.txt&apos;,dataType:&apos;json&apos;});
+    let data2 = await $.ajax({url:&apos;data/2.txt&apos;,dataType:&apos;json&apos;});
+    let data3 = await $.ajax({url:&apos;data/3.txt&apos;,dataType:&apos;json&apos;});
+    console.log(data1,data2,data3);
+})();
+</code></pre><p>继续演变成一个箭头函数</p>
+<pre><code>(async ()=&gt; {
+    let data1 = await $.ajax({url:&apos;data/1.txt&apos;,dataType:&apos;json&apos;});
+    let data2 = await $.ajax({url:&apos;data/2.txt&apos;,dataType:&apos;json&apos;});
+    let data3 = await $.ajax({url:&apos;data/3.txt&apos;,dataType:&apos;json&apos;});
+    console.log(data1,data2,data3);
+})();
+</code></pre><blockquote>
+<blockquote>
+<p>注意 genarator 不能改写成 箭头函数</p>
+</blockquote>
+</blockquote>
+<p>利用 async 和 await 写之前异步操作带逻辑的代码</p>
+<pre><code>(async ()=&gt; {
+    let data1 = await $.ajax({url:&apos;data/1.txt&apos;,dataType:&apos;json&apos;});
+    if (data1.a+data1.b&lt;10) {
+        let data2 = await $.ajax({url:&apos;data/2.txt&apos;,dataType:&apos;json&apos;});
+        console.log(data2.job,data2.salary);            
+    }else{
+        let data3 = await $.算ajax({url:&apos;data/3.txt&apos;,dataType:&apos;json&apos;});
+        console.log(data3[0].name);
+    }
+})();
+</code></pre><p>await 错误处理</p>
+<pre><code>async function show(){
+    try{
+        let data1 = await $.ajax({url:&apos;data/1.txt&apos;,dataType:&apos;json&apos;});
+        let data2 = await $.ajax({url:&apos;data/23.txt&apos;,dataType:&apos;json&apos;});//此处文件不存在
+        let data3 = await $.ajax({url:&apos;data/3.txt&apos;,dataType:&apos;json&apos;});
+        console.log(data1,data2,data4);
+    }catch(e){
+        alert(&apos;请求数据失败&apos;);
+    }
+}
+show();
+</code></pre><h3 id="babel-编译-js"><a href="#babel-编译-js" class="headerlink" title="babel 编译 js"></a><a href="http://babeljs.io/docs/setup/#installation" target="_blank" rel="noopener">babel 编译 js</a></h3><ul>
+<li>安装 node.js (最好是最新版)</li>
+<li><p>安装 cnpm 镜像源</p>
+<p>  <code>$ npm install -g cnpm --registry=https://registry.npm.taobao.org</code></p>
+</li>
+<li><p><code>cnpm init</code> 初始化工程</p>
+</li>
+<li><code>cnpm i babel-cli -D</code> 下载 npm 依赖(-D 等价于 -save-dev)</li>
+<li><p>添加 babel 编译脚本到 package.json 文件</p>
+<pre><code>&quot;scripts&quot;: {
+   &quot;start&quot;: &quot;babel src -d build&quot;
+ },
+</code></pre></li>
+<li><p>添加 .babelrc 文件 并加入如下内容</p>
+<pre><code>{
+  &quot;presets&quot;: [&quot;env&quot;]
+}
+</code></pre></li>
+<li><code>npm install babel-preset-env -D</code>下载编译需要的一些插件</li>
+<li>用 es6 语法 写一个 js 文件</li>
+<li>用 <code>npm run start</code> 命令编译</li>
+</ul>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2018-03-14</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>
