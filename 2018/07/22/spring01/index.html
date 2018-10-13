@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <title>springmvc入门程序 - hogen</title>
+    <link href='/images/fav.png' rel='shortcut icon'>
+<link href='undefined' rel='alternate' type='application/rss+xml'>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<script src="/js/jquery.js"></script>
+<script src="/js/basics.js"></script>
+<meta content='width=device-width, initial-scale=1.0, user-scalable=no' name='viewport'>
+<meta content='text/html; charset=utf-8' http-equiv='content-type'>
+
+
+  </head>
+  <body>
+    <header>
+  <a id='go-back-home' href='/'><img src='/images/scribble.png' alt='Home' width='53' height='59'></a>
+  <p>hogen</p>
+  <p>Follow Excellence. Success will chase you.</p>
+</header>
+
+    <div id='container'>
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+      <section class='paging'>
+  
+    <div class='left'>
+      <a href='/2018/07/22/springmvc02/'>
+        ‹
+      </a>
+    </div>
+  
+  
+    <div class='right'>
+      <a href='/2018/07/20/lefe-pattern/'>
+        ›
+      </a>
+    </div>
+  
+</section>
+
+      <div class='content'>
+        <section class='post'>
+          <h1>
+            <!-- <div class='date'>2018-07-22</div> --><!--正文的日期-->
+            springmvc入门程序
+          </h1>
+          <p>为什么学SpringMVC?</p>
+<p>springmvc 就是类似于 struts2 的 mvc 框架，属于 Spring 家族的成员。从以下可以看出二者的区别</p>
+<p><img src="/2018/07/22/spring01/spring01.png" alt=""></p>
+<p>springmvc 框架架构<br><img src="/2018/07/22/spring01/springmvc.png" alt=""><br>springmvc 架构流程</p>
+<ol>
+<li>用户发送请求至前端控制器 DispatcherServlet</li>
+<li>DispatcherServlet 收到请求调用 HandlerMapping 处理器映射器</li>
+<li>处理器映射器根据请求url找到具体的处理器，生成处理器对象及处理器拦截器(如果有则生成)一并返回给DispatcherServlet。</li>
+<li>DispatcherServlet通过HandlerAdapter处理器适配器调用处理器</li>
+<li>执行处理器(Controller，也叫后端控制器)。</li>
+<li>Controller执行完成返回ModelAndView</li>
+<li>HandlerAdapter将controller执行结果ModelAndView返回给DispatcherServlet</li>
+<li>DispatcherServlet将ModelAndView传给ViewReslover视图解析器</li>
+<li>ViewReslover解析后返回具体View</li>
+<li>DispatcherServlet对View进行渲染视图（即将模型数据填充至视图中）。</li>
+<li>DispatcherServlet响应用户</li>
+</ol>
+<p>入门程序</p>
+<ul>
+<li>新建 Dynamic Web project</li>
+<li><p>导入基本 jar 包</p>
+<p>  <img src="/2018/07/22/spring01/jar.png" alt=""></p>
+</li>
+<li>编写 Controller 类和 Pojo </li>
+<li>在 web.xml 里边配置前端控制器、加载 springmvc.xml 文件</li>
+</ul>
+<p><img src="/2018/07/22/spring01/itemlist.png" alt=""></p>
+<p>springmvc.xml 配置文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:p=&quot;http://www.springframework.org/schema/p&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+    xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+    xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd&quot;&gt;
+    &lt;!-- 配置@Controller处理器，包扫描器 --&gt;
+    &lt;context:component-scan base-package=&quot;com.lhg.springmvc&quot; /&gt;
+&lt;/beans&gt;
+</code></pre><p>web.xml 配置文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot; xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot; id=&quot;WebApp_ID&quot; version=&quot;2.5&quot;&gt;
+  &lt;display-name&gt;springmvc01&lt;/display-name&gt;
+  &lt;welcome-file-list&gt;
+    &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+    &lt;welcome-file&gt;index.htm&lt;/welcome-file&gt;
+    &lt;welcome-file&gt;index.jsp&lt;/welcome-file&gt;
+  &lt;/welcome-file-list&gt;
+
+  &lt;!-- 加载springmvc前端控制器(核心控制器) --&gt;
+  &lt;servlet&gt;
+    &lt;servlet-name&gt;springmvc&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+    &lt;!-- 加载springmvc配置文件 ,contextConfigLocation是DispatcherServlet父类的一个属性--&gt;
+    &lt;init-param&gt;
+        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+        &lt;param-value&gt;classpath:springMVC.xml&lt;/param-value&gt;
+    &lt;/init-param&gt;
+  &lt;/servlet&gt;
+  &lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;springmvc&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;*.action&lt;/url-pattern&gt;
+  &lt;/servlet-mapping&gt;
+&lt;/web-app&gt;
+</code></pre><p>效果<br><img src="/2018/07/22/spring01/result.png" alt=""></p>
+
+          <br>
+<p>hogen</p>
+<div class='date'>2018-07-22</div>
+
+        </section>
+      </div>
+      
+      <div class='block'>
+  
+    <a class='main' href='/'>Home</a>
+  
+    <a class='main' href='/about'>About</a>
+  
+    <a class='main' href='https://github.com/hogenlaw'>Github</a>
+  
+    <a class='main' href='https://juejin.im/user/5a459f96518825256362fb43'>JueJin</a>
+  
+    <a class='main' href='mailto:lhg9300@foxmail.com'>Email</a>
+  
+</div>
+
+    </div>
+    <footer>
+  <span class='muted'>Powered by hogenlaw</span>
+</footer>
+
+  </body>
+</html>
